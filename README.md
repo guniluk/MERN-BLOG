@@ -13,30 +13,34 @@
 4. organize the existing files at B folder 
   - delete: App.css, public/svg, src/assets/svg  
   - change: App.jsx(in "src" folder)  
-5. backup to git repository (at B)
-  - add "node_modules" to ".gitignore" file  
-  > git init   
-  > git add .   
-  > git commit -m "first commit"  
-  - go to github site  
-  - create new repository  
-  - copy command lines and execute command at terminal(B folder)  
+5. make git in A folder and backup to git repository  
+  > `cd ..`  
+  > `A> git init`  
+  > `A> git add .`   
+  > `A> git commit -m "first commit"`  
+  - go to github site and create new repository  
+  - copy command lines and execute command at terminal(A folder)  
   - see the git push result at github site repository  
-<hr/>
+<hr/>  
 
-- (23) route & create pages(B folder(client))    
+6. route & create pages(B folder(client))    
   - install library   
     > `npm i react-router-dom`  
-  - create "pages" folder in "src" folder of B(client), and make pages(Home, etc)  
+  - create "pages" folder in "src" folder of B(client), and make pages(Home.jsx, etc)  
   - modify app.jsx  
-    > `import { BrowserRouter, Routes, Route } from 'react-router-dom';`  
-    > `import Home from './pages/Home';`    
-    > `<BrowserRouter>`    
-    > &nbsp;&nbsp;` <Routes>`    
-    > &nbsp;&nbsp;&nbsp;&nbsp; `  <Route path="/" element={<Home />} />`    
-    > &nbsp;&nbsp; `</Routes>`    
-    > `</BrowserRouter>`  
-
+    ```javascript
+    import { BrowserRouter, Routes, Route } from 'react-router-dom';  
+    import Home from './pages/Home';    
+    function App() {
+      return (
+        <BrowserRouter>    
+          <Routes>    
+            <Route path="/" element={<Home />} />    
+          </Routes>    
+        </BrowserRouter>  
+      )
+    }
+    export default App
 - (24) create "components" folder in "src" folder of B(client), and make components(Header.jsx)  
   - apply tailwind css    
   - navigate using "Link"  
