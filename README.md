@@ -1,0 +1,1097 @@
+# 【Fullstack procedure】
+#### ✭Folder : A(project), B(client), C(api(server))  
+## ◼︎ React
+
+1. create project folder A(fullstack)   
+2. install react at B(client) folder  
+  - A> `npm create vite@latest (B)`  
+  - A> `cd B`  
+3. install tailwind as below procedure(at B)         
+  - search 'tailwind vite' in google(https://tailwindcss.com)    
+  - select 'Installing Tailwind CSS with vite' site  
+  - confirm 'using Vite' is selected, and follow the steps in order  
+4. organize the existing files at B folder 
+  - delete: App.css, public/svg, src/assets/svg  
+  - change: App.jsx(in "src" folder)  
+5. backup to git repository (at B)
+  - add "node_modules" to ".gitignore" file  
+  > git init   
+  > git add .   
+  > git commit -m "first commit"  
+  - go to github site  
+  - create new repository  
+  - copy command lines and execute command at terminal(B folder)  
+  - see the git push result at github site repository  
+<hr/>
+
+- (23) route & create pages(B folder(client))    
+  - install library   
+    > `npm i react-router-dom`  
+  - create "pages" folder in "src" folder of B(client), and make pages(Home, etc)  
+  - modify app.jsx  
+    > `import { BrowserRouter, Routes, Route } from 'react-router-dom';`  
+    > `import Home from './pages/Home';`    
+    > `<BrowserRouter>`    
+    > &nbsp;&nbsp;` <Routes>`    
+    > &nbsp;&nbsp;&nbsp;&nbsp; `  <Route path="/" element={<Home />} />`    
+    > &nbsp;&nbsp; `</Routes>`    
+    > `</BrowserRouter>`  
+
+- (24) create "components" folder in "src" folder of B(client), and make components(Header.jsx)  
+  - apply tailwind css    
+  - navigate using "Link"  
+    > `import { Link } from 'react-router-dom';`    
+    > &nbsp;&nbsp;`<Link to="/">`   
+    > &nbsp;&nbsp;&nbsp;&nbsp;`<li className="hidden sm:inline text-slate-700 hover:underline">`    
+    >  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`Home`   
+    >  &nbsp;&nbsp;&nbsp;&nbsp;`</li>`   
+    > &nbsp;&nbsp;`</Link>`    
+- (25) modify app.jsx (include "Header" component)  
+  > `<BrowserRouter>`  
+  > `<Header />`  
+  > `<Routes>`  
+  > `<Route path="/" element={} />`   
+  > `</Routes>`   
+  > `</BrowserRouter>`  
+
+## ◼︎ Express   
+- (6) go to project folder A(fullstack)  
+- (7) init npm : A>`npm init -y`  
+- (8) install express(in A folder)  
+  > A>`npm i express`  
+- (9) install nodemon : A>`npm i nodemon -D`   
+  - if globally installed before, it doesn't need to install again  
+- (10) modify package.json    
+  > `"type": "module"`   
+  > `"scripts": {`    
+  > &nbsp;&nbsp;&nbsp;&nbsp;`"dev": "nodemon api/index.js",`   
+  > &nbsp;&nbsp;&nbsp;&nbsp;`"start": "node api/index.js"}`    
+- (11) create server folder C(api) in A      
+- (12) make "index.js" at C folder  
+  > `import express from 'express';`    
+  > `const app = express();`    
+  > `app.use(express.json());`  
+  > `const port = 3000;`   
+  > `app.listen(port, () => {`    
+  > `console.log(`Server is running on port ${port}`) });`  
+- (13) create routes folder and route file(user.route.js) in C folder(api)   
+  > `import express from 'express';`   
+  > `import { test } from '../controllers/user.controller.js';`   
+  > `const router = express.Router();`   
+  > `router.get('/test', test);`   
+  > `export default router;`     
+- (14) create controllers folder and controller file(user.controller.js) in C folder(api)   
+  > `export const test = (req, res) => {`   
+  > &nbsp;&nbsp;`res.json({ message: 'Test API route working!' });`   
+  > `};`  
+
+- (15) connect routes to index.js     
+  > `import userRouter from './routes/user.route.js';`   
+  > `app.use('/api/users', userRouter);`  
+#### (16) Change git folder (B → A)  
+- B(client)> `mv .git ../`  
+- move ".gitignore" in B to A     
+  - check & add "node_modules", ".env" to ".gitignore"  
+- move "README md file" in B to A(if exists)  
+- git commit & push(at A folder)  
+  > `git add .`   
+  > `git commit -m "~~~"`   
+  > `git push`  
+<hr />
+
+## ◼︎ MongoDB  
+- (17) install mongoose at A(fullstack)   
+  > A> `npm i mongoose`   
+- (18) At MongoDB site, create new project  
+  - input project name(fullstack)   
+  - change or confirm username, password and click create user  
+  - choose connectton method → select Drivers  
+  - At mongoDB site, select NETWORK ACCESS, IP Acess List, Add IP Adress    
+    Access List Entry: 0.0.0.0, Comment:test   
+- (19) create ".env" file in A(fullstack)  
+  > `MONGO = "Mongodb_site_url"`  
+- (20) install "dotenv" at A(fullstack)  
+  > `npm i dotenv`  
+- (21) Add connection string into "index.js"  
+    > `import mongoose from 'mongoose';`  
+    > `import dotenv from 'dotenv';`  
+    > `dotenv.config();`  
+    > `mongoose`  
+    > `.connect(process.env.MONGO)`  
+    > `.then(() => {`  
+    > `console.log('Connected to MongoDB!');})`  
+    > `.catch((err) => {`  
+    > `console.error('Error connecting to MongoDB:', err);});`  
+- (22) add ".env" to ".gitignore"  
+  > .env  
+  <hr/>  
+- (26) create "models" folder in C folder(api) and make schema and model(user.model.js)   
+  > `import mongoose from 'mongoose';`    
+  > `const userSchema = new mongoose.Schema(`       
+  > `{`      
+  > &nbsp; &nbsp;`username: {`      
+  > &nbsp; &nbsp;&nbsp; &nbsp;`type: String,`      
+  > &nbsp; &nbsp;&nbsp; &nbsp;`required: true,`      
+  > &nbsp; &nbsp;&nbsp; &nbsp;`unique: true,`      
+  > &nbsp; &nbsp;`},`      
+  > &nbsp; &nbsp;`password: {`     
+  > &nbsp; &nbsp;&nbsp; &nbsp;`type: String,`    
+  > &nbsp; &nbsp;&nbsp; &nbsp;`required: true,`   
+  > &nbsp; &nbsp;`},`   
+  > `},`   
+  > &nbsp; &nbsp;`{ timestamps: true },`   
+  > `);`   
+  > `const User = mongoose.model('User', userSchema);`   
+  > `export default User;`     
+<hr/>
+
+### (27) auth(signup) procedure (server(C)/Insomnia/MongoDB)  
+- make auth.route.js in routes folder  
+  > `import express from 'express';`  
+  > `import { signup } from '../controllers/auth.controller.js';`    
+  > `const router = express.Router();`   
+  > `router.post('/signup', signup);`    
+  > `export default router;`    
+- make auth.controller.js in controllers folder  
+  > `import User from '../models/user.model.js';`  
+  > `export const signup = async (req, res) => {`  
+  > `const { username, email, password } = req.body;`  
+  > `const newUser = new User({ username, email, password });`  
+  > `try {`  
+  > &nbsp;&nbsp;`await newUser.save();`  
+  > &nbsp;&nbsp;`res.status(201).json({ message: 'User created successfully!' });`  
+  > `} catch (err) {`  
+  > &nbsp;&nbsp;`console.error('Error creating user:', err);`  
+  > &nbsp;&nbsp;`return res.status(500).json({ message: 'Internal server error' });`  
+  > `}`   
+  > `};`   
+- connect auth.route.js to index.js   
+  > `import authRouter from './routes/auth.route.js';`  
+  > `app.use('/api/auth', authRouter);`  
+- send POST request at Insomnia
+  > POST : localhost:3000/api/auth/signup  
+  > BODY(JSON)  
+    `{`  
+	  `"username" : "test",`
+	  `"email" : "test@test.com",`
+	  `"password" : "test1"`
+	  `}`  
+- in Mongo DB site, check new user is created   
+- install bcryptjs at A(fullstack) for password encryption  
+  > A> `npm i bcryptjs`  
+- modify auth.controller.js  
+  > `import bcryptjs from 'bcryptjs';`  
+  > `export const signup = async (req, res) => {`  
+  > `const { username, email, password } = req.body;`  
+  > `const hashedPassword = bcrypt.hashSync(password, 10);`  
+  > `const newUser = new User({ username, email, password: hashedPassword });`   
+- send POST request at Insomnia for other user, and in Mongo DB site, check new user is created with encrypted password  
+<hr/>  
+
+### (28) middleware handling errors (Server(C))
+- add middleware to handle errors in index.js
+  > `app.use((err, req, res, next) => {`  
+  > `const statusCode = err.statusCode || 500;`  
+  > `const message = err.message || 'Internal Server Error';`  
+  > `return res.status(statusCode).json({`  
+  > &nbsp;&nbsp;`success: false,`  
+  > &nbsp;&nbsp;`statusCode,`  
+  > &nbsp;&nbsp;`message,`  
+  > &nbsp;&nbsp;`});`  
+  > `});`  
+- modify controller file(auth.controller.js)  
+  > `export const signup = async (req, res, next) => {`  
+  > &nbsp;&nbsp;`catch (err) {`  
+  > &nbsp;&nbsp;`next(err);`  
+  > &nbsp;&nbsp;`}`  
+  > `};`  
+### (29) handling errors manually if needed (Server (C))
+- make "utils" folder and "error.js"
+> `export const errorHandler = (statusCode, message) => {`  
+>  `const error = new Error();`  
+>  `error.message = message;`  
+>  `error.statusCode = statusCode;`  
+>  `return error;`  
+> `};`  
+- use if needed in controller or other file  
+### (30) auth(sign-up) procedure  (Client (B))  
+- make form in "SignUp.jsx" page  
+  > `import { useState } from 'react';`  
+  > `export default function SignUp() {`  
+  > `const [formData, setFormData] = useState({});`<br/>
+  > `const handleChange = (e) => {`  
+  > &nbsp;&nbsp;`setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));`  
+  > `};`<br/>  
+  > `const handleSubmit = async (e) => {`  
+  > &nbsp;&nbsp;`e.preventDefault();`  
+  > &nbsp;&nbsp;`const res = await fetch('/api/auth/signup', {`  
+  > &nbsp;&nbsp;   `method: 'POST',`  
+  > &nbsp;&nbsp;   `headers: {`  
+  > &nbsp;&nbsp;     `'Content-Type': 'application/json',`  
+  > &nbsp;&nbsp;   `},`  
+  > &nbsp;&nbsp;   `body: JSON.stringify(formData),`  
+  > &nbsp;&nbsp; `});`  
+  > &nbsp;&nbsp; `const data = await res.json();`  
+  > &nbsp;&nbsp; `setFormData({});`  
+  > &nbsp;&nbsp;`};`<br/>  
+  > `return (`  
+  > `<div>`  
+  >&nbsp;&nbsp;    `<h1>Sign Up</h1>`  
+  >&nbsp;&nbsp;    `<form. onSubmit={handleSubmit}>`  
+  >&nbsp;&nbsp;      `<input id="username" onChange={handleChange} />`  
+  >&nbsp;&nbsp;      `<input id="email" onChange={handleChange} />`  
+  >&nbsp;&nbsp;      `<input id="password" onChange={handleChange} />`  
+  >&nbsp;&nbsp;      `<button> Sign Up </button>`  
+  >&nbsp;&nbsp;    `</form>`  
+  > `</div>`  
+  > `);`  
+  > `}`   
+- set proxy at vite.config.js  
+> `server: {`  
+> &nbsp;&nbsp;`proxy: {`  
+> &nbsp;&nbsp;&nbsp;&nbsp;`'/api': {`  
+> &nbsp;&nbsp;&nbsp;&nbsp;`target: 'http://localhost:3000',`  
+> &nbsp;&nbsp;&nbsp;&nbsp;`secure: false,`  
+> &nbsp;&nbsp;&nbsp;&nbsp;`},`  
+> &nbsp;&nbsp;`},`  
+> `},`  
+- run both frontend and backend :   
+  > B(client)> `npm run dev`
+  > A(server, not C)> `npm run dev`
+- send Form message at Fronted(B)  and check if it is created in the DB  
+### (31) loading & error handling (Client (B) page(signUp.jsx))  
+- set disalbed attribute when loading, and set error message and display when error. when normal, navigate to sign-in page 
+  > ...
+  > `import { Link, useNavigate } from 'react-router-dom';`  
+  > `export default function SignUp() {`  
+  > `const [error, setError] = useState(null);`  
+  > `const [loading, setLoading] = useState(false);`  
+  > `const navigate = useNavigate();`  
+  > ...
+  > `const handleSubmit = async (e) => {`  
+    > `e.preventDefault();`  
+    > `try {`  
+    >  &nbsp;&nbsp;`setLoading(true);`  
+    >  &nbsp;&nbsp;`const res = await fetch('/api/auth/signup', {`  
+    >    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`method: 'POST', headers: {'Content-Type': 'application/json',},`  
+    >    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`body: JSON.stringify(formData)});`  
+    >  `const data = await res.json();`  
+    >  `if (data.success === false) {`  
+    >    &nbsp;&nbsp;&nbsp;&nbsp;`setLoading(false);`  
+    >    &nbsp;&nbsp;&nbsp;&nbsp;`setError(data.message);`  
+    >    &nbsp;&nbsp;&nbsp;&nbsp;`return;}`  
+    >  `setLoading(false);`  
+    >  `setError(null);`
+    >  `setFormData({});`  
+    >  `navigate('/sign-in');`  
+    >`} catch (error) {`  
+    >  &nbsp;&nbsp;&nbsp;&nbsp;`setLoading(false);`  
+    >  &nbsp;&nbsp;&nbsp;&nbsp;`setError(error.message);`  
+    >`}`  
+  > `return (`  
+  > ...
+  >   &nbsp;&nbsp;&nbsp;&nbsp;`<button disabled={loading}>`  
+  >     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `{loading ? 'Signing up...' : 'Sign Up'}`  
+  >  &nbsp;&nbsp;&nbsp;&nbsp; `</button>`  
+  >   &nbsp;&nbsp;&nbsp;&nbsp; `{error && (<div> {error} </div>)}`  
+  > ...
+  >`)`  
+  > `}`  
+<hr/>
+
+### (32) sign-in procedure (api(C))  
+- install "jsonwebtoken" at A(fullstack)  
+  > A> `npm i jsonwebtoken`  
+- add sign-in function in "auth.controller.js"  
+  > ...  
+  > `import { errorHandler } from '../utils/error.js';`  
+  > `import jwt from 'jsonwebtoken';`  
+  > ...
+  > `export const signin = async (req, res, next) => {`  
+  > `const { email, password } = req.body;`  
+  > `try {`  
+  > &nbsp;&nbsp; `const validUser = await User.findOne({ email });`  
+  > &nbsp;&nbsp; `if (!validUser) {`  
+  > &nbsp;&nbsp; `  return next(errorHandler(404, 'User not found!'));}`  
+  > &nbsp;&nbsp; `const isPasswordValid = bcryptjs.compareSync(password, validUser.password);`  
+  > &nbsp;&nbsp; `if (!isPasswordValid) {`  
+  > &nbsp;&nbsp; `  return next(errorHandler(401, 'Invalid password!'));}`  
+  > &nbsp;&nbsp; `const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);`  
+  > &nbsp;&nbsp; `const { password: pass, ...rest } = validUser._doc;`  
+  > &nbsp;&nbsp; `res.cookie('access_token', token, {httpOnly: true,`  
+  > &nbsp;&nbsp; `    expire: new Date(Date.now() + 1000 * 60 * 60 * 24)})`  
+  > &nbsp;&nbsp; `   .status(200).json(rest);`  
+  >  `} catch (error) {next(error);}`  
+  > `}`  
+- add 'signin" route to "auth.route.js"  
+  >`...`  
+  >`import { signup, signin } from '../controllers/auth.controller.js';`  
+  >`router.post('/signin', signin);`  
+  >`...`  
+- there no coding in "index.js", because middleware is already included
+  > `import authRouter from './routes/auth.route.js';`  
+  > `app.use('/api/auth', authRouter);`  
+- at insomnia, try login and see the result(check if password is not included, and token is created )  
+  > POST : lcalhost:3000/api/auth/signin  
+  > BODY(JSON) :  
+  > {"email" : "bbb@bbb.com", "password" : "bbb"}  
+### (33) make signin.jsx page in client(B), much like signUp.jsx(copy and modify) 
+<hr/>
+
+### (34)  Redux(globally (data) state managing, substitute for useContext) : possibly use received data(`res.json(rest)`) from "auth.controller.js"(server) at every Client(B) pages    
+- install redux toolkit at B(client)  
+  > B> `npm i @reduxjs/toolkit react-redux`  
+- create folder and file: src/redux/store.js  
+- code store.js  
+  > `import { configureStore } from '@reduxjs/toolkit';`  
+  > `export const store = configureStore({`  
+  > `reducer: {},`  
+  > `middleware: (getDefaultMiddleware) =>`  
+  > `getDefaultMiddleware({serializableCheck: false,}),`  
+  > `});`  
+- modify "main.jsx"   
+  > `import { Provider } from 'react-redux';`  
+  > `import { store } from './redux/store';`  
+  > ...  
+  > `<Provider store={store}>`  
+  > `<App />`  
+  > `</Provider>`    
+- create a Redux Static Slice  
+   - make folder("user") in "redux" folder  
+   - make "userSlice.js" in "user"  
+    > `import { createSlice } from '@reduxjs/toolkit';`    
+    > `const initialState = {`  
+    > &nbsp;&nbsp;`currentUser: null,`  
+    > &nbsp;&nbsp;`error: null,`  
+    > &nbsp;&nbsp;`loading: false,`  
+    > `};`  
+    > `export const userSlice = createSlice({`  
+    > `name: 'user',`  
+    > `initialState,`  
+    > `reducers: {`  
+    > `singnInStart: (state) => {state.loading = true;},`  
+    > `signInSuccess: (state, action) => {`  
+    > &nbsp;&nbsp;`state.currentUser = action.payload;`  
+    > &nbsp;&nbsp;`state.loading = false;`  
+    > &nbsp;&nbsp;`state.error = null;`  
+    > `},`  
+    > `signInFailure: (state, action) => {`  
+    > &nbsp;&nbsp;`state.error = action.payload;`  
+    > &nbsp;&nbsp;`state.loading = false;`  
+    > `},`  
+    > `},`  
+    > `});`  
+    > `export const { singnInStart, signInSuccess, signInFailure } = userSlice. actions;`  
+    > `export default userSlice.reducer;`  
+- modify store.js  
+  > ...  
+  > `import userReducer from './user/userSlice';`  
+  > ...  
+    `reducer: {user: userReducer,},`  
+  > ...  
+- apply dispatch to pages (signin.jsx)
+  > ...  
+  > `import { useDispatch, useSelector } from 'react-redux';`  
+  > `import {signInStart, signInSuccess, signInFailure,} from '../redux/user/userSlice';`  
+  > `export default function SignIn() {`  
+  > ...  
+  > // const [error, setError] = useState(null);  
+  > // const [loading, setLoading] = useState(false);  
+  > `const { error, loading } = useSelector((state) => state.user);`  
+  > ...  
+  > `const dispatch = useDispatch();`  
+  > ...  
+  > `const handleSubmit = async (e) => {`  
+  >  ...  
+  >  `try {`  
+  >    // setLoading(true);  
+  >    `dispatch(signInStart());`  
+  >    ...  
+  >    `if (data.success === false) {`  
+  >      // setLoading(false);  
+  >      // setError(data.message);  
+  >      `dispatch(signInFailure(data.message));`  
+  >      `return;`  
+  >    `}`  
+  >    // setLoading(false);  
+  >    // setError(null);  
+  >    `dispatch(signInSuccess(data));`  
+  >    ...  
+  >  `} catch (error) {`   
+  >    `// setLoading(false);`    
+  >    `// setError(error.message);`   
+  >    `dispatch(signInFailure(error.message));`  
+  >  `}`  
+  > `};`    
+
+### (35)  make Redux persist (retain data after page is refreshed)  
+- install redux-persist at B(client)  
+  > B> `npm i redux-persist`  
+- modify "store.js"  
+  > ...  
+  > `import { combineReducers, configureStore } from '@reduxjs/toolkit';`  
+  > `import { persistReducer, persistStore } from 'redux-persist';`  
+  > `import storage from 'redux-persist/lib/storage';`  
+  > `const rootReducer = combineReducers({user: userReducer,});`  
+  > `const persistConfig = {`  
+  > `key: 'root', storage, version: 1,};`  
+  > `const persistedReducer = persistReducer(persistConfig, rootReducer);`  
+  > `export const store = configureStore({`  
+  > ` reducer: persistedReducer,`  
+  > ...  
+  > `});`  
+  > ...  
+  > `export const persistor = persistStore(store);`  
+- modify "main.jsx"  
+  > ...  
+  > `import { persistor, store } from './redux/store.js';`  
+  > `import { PersistGate } from 'redux-persist/integration/react';`  
+  > `createRoot(document.getElementById('root')).render(`  
+  > `<Provider store={store}>`  
+  > ` <PersistGate loading={null} persistor={persistor}>`  
+  > `   <App />`  
+  > ` </PersistGate>`  
+  > `</Provider>,`  
+  > `);`  
+<hr/>
+
+### (36)  make profile page private(only show profile page when signed in)  
+- modify Header.jsx (show image when signin, else "sign-in" message)  
+  > ...  
+  > `import { useSelector } from 'react-redux';`  
+  > `export default function Header() {`  
+  > `const { currentUser } = useSelector((state) => state.user);`  
+  > `return (`  
+  > `...`  
+  > `<Link to="/profile">`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`{currentUser ? (<img src="byh.jpg"/>) : (<li>Sign In</li>)}`  
+  > `</Link>`  
+  > ...  
+- create PrivateRoute.jsx  
+  >`import { useSelector } from 'react-redux';`  
+  >`import { Outlet, Navigate } from 'react-router-dom';`  
+  >`export default function PrivateRoute() {`  
+  >`const { currentUser } = useSelector((state) => state.user);`  
+  >`return currentUser ? <Outlet /> : <Navigate to="/sign-in" />;}`  
+- modify App.jsx()  
+  > ...  
+  > `import PrivateRoute from './components/PrivateRoute';`
+  > `export default function App() {`  
+  > `return (`  
+  > ...  
+  > `<Route element={<PrivateRoute />}>`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`<Route path="/profile" element={<Profile />} />`  
+  > `</Route>`  
+  > ...  
+<hr/>
+
+### (37)  update user profile at server(C)  
+- enable parsing cookie in index.js  
+  > ...  
+  > `import cookieParser from 'cookie-parser';`  
+  > ...  
+  > `app.use(cookieParser());`  
+- check if authenticated or not(create middleware verifyUser.js in utils folder)  
+  > `import { errorHandler } from './error.js';`  
+  > `import jwt from 'jsonwebtoken';`  
+  > `export const verifyToken = (req, res, next) => {`  
+  > `const token = req.cookies.access_token;`  
+  > `if (!token) return next(errorHandler(401, 'Unauthenticated!'));`  
+  > `jwt.verify(token, process.env.JWT_SECRET, (err, user) => {`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`if (err) return next(errorHandler(403, 'Token is not valid!'));`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`req.user = user;`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`next();`
+  > `}); };`
+- create verified user update router in user.route.js  
+  > `import { updateUser } from '../controllers/user.controller.js';`  
+  > `import { verifyToken } from '../utils/verifyUser.js';`  
+  > ...  
+  > `router.post('/update/:id', verifyToken, updateUser);`  
+- update user DB in user.controller.js  
+  > `import bcryptjs from 'bcryptjs';`  
+  > `import User from '../models/user.model.js';`  
+  > `import { errorHandler } from '../utils/error.js';`  
+  > `export const updateUser = async (req, res, next) => {`  
+  > `if (req.user.id !== req.params.id) {`  
+  > &nbsp;&nbsp;`return next(errorHandler(401, 'You can update only your account!'));}`  
+  > `try {`  
+  > &nbsp;&nbsp;`if (req.body.password) {`  
+  > &nbsp;&nbsp;`req.body.password = bcryptjs.hashSync(req.body.password, 10);}`  
+  > `const updatedUser = await User.findByIdAndUpdate(`  
+  > &nbsp;&nbsp;`req.params.id,`  
+  > &nbsp;&nbsp;`{`  
+  > &nbsp;&nbsp;`$set: {`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`username: req.body.username,`  
+  >&nbsp;&nbsp;&nbsp;&nbsp; `email: req.body.email,`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`password: req.body.password, },},`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`{ new: true },);`  
+  > `const { password, ...rest } = updatedUser._doc;`  
+  > `res.status(200).json(rest);`  
+  > `} catch (error) {next(error);}`  
+  > `};`  
+- using insomnia, test update user
+  > POST : localhost:3000/api/users/update/user_id
+
+### (38)  update user profile at client(B)  
+- create update user reducer in userSlice.js  
+  > `export const userSlice = createSlice({`  
+  > ...  
+  > `reducers: {`  
+  > ...  
+  > `updateUserStart: (state) => {`  
+  > &nbsp;&nbsp;`state.loading = true;},`  
+  > `updateUserSuccess: (state, action) => {`  
+  > &nbsp;&nbsp;`state.currentUser = action.payload;`  
+  > &nbsp;&nbsp;`state.loading = false;`  
+  > &nbsp;&nbsp;`state.error = null;},`  
+  > `updateUserFailure: (state, action) => {`  
+  > &nbsp;&nbsp;`state.error = action.payload;`  
+  > &nbsp;&nbsp;`state.loading = false;},`  
+  > ...  
+- add change, submit handler in profile.jsx  
+  > ...  
+  > `import {updateUserStart, updateUserSuccess, updateUserFailure,} from '../redux/user/userSlice';`  
+  > `import { useDispatch } from 'react-redux';`  
+  > ...  
+  > `export default function Profile() {`  
+  > `const { currentUser, loading, error } = useSelector((state) => state.user);`  
+  > `const dispatch = useDispatch();`  
+  > `const [formData, setFormData] = useState({});`  
+  > `const [updateSuccess, setUpdateSuccess] = useState(false);`  
+  > `const handleChange = (e) => {`  
+  > &nbsp;&nbsp;`setFormData({ ...formData, [e.target.id]: e.target.value });};`  
+  > `const handleSubmit = async (e) => {`  
+  > &nbsp;&nbsp;`e.preventDefault();`  
+  > &nbsp;&nbsp;`try {`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`dispatch(updateUserStart());`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`const res = await fetch('/api/users/update/${currentUser._id}', {`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`method: 'POST', headers: {'Content-Type': 'application/json',},`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`body: JSON.stringify(formData),});`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`const data = await res.json();`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`if (data.success === false) {`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`dispatch(updateUserFailure(data.message));`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`return;}`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`dispatch(updateUserSuccess(data));`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`setUpdateSuccess(true);`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`setFormData({});`  
+  > &nbsp;&nbsp;`} catch (error) {`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`dispatch(updateUserFailure(error.message));}`  
+  > `};`  
+  > `return (`  
+    &nbsp;&nbsp;`<div>`  
+    &nbsp;&nbsp;`<form onSubmit={handleSubmit}>`  
+  > &nbsp;&nbsp;...  
+  > &nbsp;&nbsp;`<input`  
+    &nbsp;&nbsp;&nbsp;&nbsp;`type="text"`  
+    &nbsp;&nbsp;&nbsp;&nbsp;`id="username"`  
+    &nbsp;&nbsp;&nbsp;&nbsp;`placeholder="Username"`  
+    &nbsp;&nbsp;&nbsp;&nbsp;`defaultValue={currentUser.username}`  
+    &nbsp;&nbsp;&nbsp;&nbsp;`onChange={handleChange}/>`  
+  >&nbsp;&nbsp;...  
+  > &nbsp;&nbsp;`<button`  
+    &nbsp;&nbsp;&nbsp;&nbsp;`disabled={loading}`  
+  >  &nbsp;&nbsp;&nbsp;&nbsp;...  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`{loading ? 'Loading' : 'User update'}`  
+  > &nbsp;&nbsp;`</button>`  
+  > &nbsp;&nbsp;`</form>`  
+  > &nbsp;&nbsp;...  
+- using insomnia, change and update profile, check Mongo DB
+<hr/>
+
+### (39)  delete user profile at server(C)  
+- create delete router in user.route.js  
+  > `import {deleteUser} from '../controllers/user.controller.js';`  
+  > ...  
+  > `router.delete('/delete/:id', verifyToken, deleteUser);`  
+- delete user DB in user.controller.js  
+  > ...  
+  > `export const deleteUser = async (req, res, next) => {`  
+  > `if (req.user.id !== req.params.id) {`  
+  > &nbsp;&nbsp;`return next(errorHandler(401, 'You can delete only your account!')); }`  
+  > `try {`  
+  > &nbsp;&nbsp;`await User.findByIdAndDelete(req.params.id);`  
+  > &nbsp;&nbsp;`res.clearCookie('access_token');`  
+  > &nbsp;&nbsp;`res.status(200).json({ message: 'User deleted successfully!' });`  
+  > `} catch (error) {`  
+  > `next(error); } };`  
+
+### (40)  delete user profile at client(B)  
+- create delete user reducer in userSlice.js  
+  > ...  
+  > `export const userSlice = createSlice({`  
+  > `name: 'user', initialState,`  
+  > `reducers: {`  
+  > ...  
+  > `deleteUserStart: (state) => {`  
+  > &nbsp;&nbsp;`state.loading = true;},`  
+  > `deleteUserSuccess: (state) => {`  
+  > &nbsp;&nbsp;`state.currentUser = null;`  
+  > &nbsp;&nbsp;`state.loading = false;`  
+  > &nbsp;&nbsp;`state.error = null;},`  
+  > `deleteUserFailure: (state, action) => {`  
+  > &nbsp;&nbsp;`state.error = action.payload;`  
+  > &nbsp;&nbsp;`state.loading = false;},`  
+  > ...
+- add delete handler in profile.jsx  
+  > ...  
+  > `import {deleteUserStart, deleteUserSuccess, deleteUserFailure,} from '../redux/user/userSlice';`  
+  > `export default function Profile() {`  
+  > ...
+  > `const handleDelete = async () => {`  
+  > &nbsp;&nbsp;`try {`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`dispatch(deleteUserStart());`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`const res = await fetch('/api/users/delete/${currentUser._id}', {method: 'DELETE',});`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`const data = await res.json();`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`if (data.success === false) {`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`dispatch(deleteUserFailure(data.message));`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`return;}`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`dispatch(deleteUserSuccess(data));`  
+  > &nbsp;&nbsp;`} catch (error) {`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`dispatch(deleteUserFailure(error.message));}`  
+  > &nbsp;&nbsp;`};`  
+  > ...
+<hr/>
+
+### (41) signout at server(C)  
+- add signout router in auth.route.js  
+  > `import { signup, signin, signout } from '../controllers/auth.controller.js';`  
+  > ...  
+  > `router.get('/signout', signout);`    
+  > ...  
+- add signout function in auth.controller.js  
+  > ...  
+  > `export const signout = async (req, res, next) => {`  
+  > `try {`  
+  > &nbsp;&nbsp;`res.clearCookie('access_token');`  
+  > &nbsp;&nbsp;`res.status(200).json({ message: 'User logged out successfully!' });`  
+  > `} catch (error) {`  
+  > &nbsp;&nbsp;`next(error);}`  
+  > `};`  
+
+### (42) signout at client(B)  
+- create signout reducer in userSlice.js  
+  > ...  
+  > `signoutStart: (state) => {`  
+  > &nbsp;&nbsp;`state.loading = true;},`  
+  > `signoutSuccess: (state) => {`  
+  > &nbsp;&nbsp;`state.currentUser = null;`  
+  > &nbsp;&nbsp;`state.loading = false;`  
+  > &nbsp;&nbsp;`state.error = null;},`  
+  > `signoutFailure: (state, action) => {`  
+  > &nbsp;&nbsp;`state.error = action.payload;`  
+  > &nbsp;&nbsp;`state.loading = false;},`  
+  > ...
+- add signout handler in profile.jsx  
+  > ...  
+  > `import {signoutStart, signoutSuccess, signoutFailure,} from '../redux/user/userSlice';`  
+  > `export default function Profile() {`  
+  > ...  
+  > `const handleSignout = async () => {`  
+  > `try {`  
+  > &nbsp;&nbsp;`dispatch(signoutStart());`  
+  > &nbsp;&nbsp;`const res = await fetch('/api/auth/signout', {method: 'GET',});`  
+  > &nbsp;&nbsp;`const data = await res.json();`  
+  > &nbsp;&nbsp;`if (data.success === false) {`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`dispatch(signoutFailure(data.message));`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`return;}`  
+  > &nbsp;&nbsp;`dispatch(signoutSuccess(data));`  
+  > `} catch (error) {`  
+  > &nbsp;&nbsp;`dispatch(signoutFailure(error.message));`  
+  > `}`  
+  > ...  
+<hr/>
+the end of signup, login, logout 
+<hr/>   
+
+### (43) Add listing api route at server(C) and MongoDB  
+- create listing route, listing.route.js in routes folder   
+  >`import express from 'express';`  
+  >`import { createListing } from '../controllers/listing.controller.js';`  
+  >`import { verifyToken } from '../utils/verifyUser.js';`  
+  >`const router = express.Router();`  
+  >`router.post('/create', verifyToken, createListing);`  
+  >`export default router;`  
+- add router in index.js  
+  > ...  
+  > `import listingRouter from './routes/listing.route.js';`  
+  > ...  
+  > `app.use('/api/listing', listingRouter);`  
+- create listing controller in listing.controller.js(controllers folder)  
+  > `import Listing from '../models/listing.model.js';`  
+  > `export const createListing = async (req, res, next) => {`  
+  > `try {`  
+  > &nbsp;&nbsp;`const listing = await Listing.create(req.body);`  
+  > &nbsp;&nbsp;`res.status(201).json(listing);`  
+  > `} catch (error) {`         
+  > &nbsp;&nbsp;`next(error);`  
+  > `}};`   
+- create listing model in listing.model.js(models folder)  
+  > `import mongoose from 'mongoose';`  
+  > `const listingSchema = new mongoose.Schema(`  
+  > `{`  
+  > `name: {`  
+  > `type: String,`  
+  > `required: true,`  
+  > `},`  
+  > `...}`  
+  > `{ timestamps: true } );`  
+  > `const Listing = mongoose.model('Listing', listingSchema);`  
+  > `export default Listing;`  
+- using insomnia, create new listing
+  > POST : localhost:3000/api/listing/create (logged in first)
+- check MongoDB if the listing is created
+<hr/>
+
+### (44) add listing page at client(B)  
+- add link button in profile.jsx  
+  > `import { Link } from 'react-router-dom';`  
+  > ...  
+  > `<form>`  
+  > ...
+  > `<Link to="/create-listing">`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`Create Listing`  
+  > `</Link>`  
+  > `</form>`  
+  > ...
+- add route in app.jsx as a member of ProviteRoute  
+  > ...  
+  > `import CreateListing from './pages/CreateListing';`  
+  > ...
+  > `<Route element={<PrivateRoute />}>`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`<Route path="/create-listing" element={<CreateListing />} />`  
+  > `</Route>`    
+  > ...
+- create CreateListing.jsx  
+  - make UI for needed data
+  - make functionality
+  - when succeded, navigate to list page
+
+### (45) get a certain user's listings at server(C)  
+- modify user.route.js  
+  > ...   
+  > `import {getUserListings} from '../controllers/user.controller.js';`  
+  > ...  
+  > `router.get('/listings/:id', verifyToken, getUserListings);`  
+  > ...  
+- modify user.controller.js  
+  > ...  
+  > `import Listing from '../models/listing.model.js';`   
+  > ...  
+  > `export const getUserListings = async (req, res, next) => {`  
+  > `if (req.user.id !== req.params.id) {`  
+  > `return next(errorHandler(401, 'You can get only your listings!'));}`  
+  > `try {`  
+  > `const listings = await Listing.find({ userRef: req.params.id });`  
+  > `res.status(200).json(listings);`  
+  > `} catch (error) {next(error);}`  
+  > `};`  
+<hr/>
+
+### (46) delete user listing at server(C) and client(B)  
+- modify listing.route.js(at server)  
+  > ...  
+  > `import {deleteListing} from '../controllers/listing.controller.js';`  
+  > ...  
+  > `router.delete('/delete/:id', verifyToken, deleteListing);`  
+  > ...  
+- modify listing.controller.js(at server)  
+  > ...  
+  > `export const deleteListing = async (req, res, next) => {`  
+  > `try {`  
+  > &nbsp;&nbsp;`const listing = await Listing.findById(req.params.id);`  
+  > &nbsp;&nbsp;`if (!listing) {return next(errorHandler(404, 'Listing not found!'));}`  
+  > &nbsp;&nbsp;`if (listing.userRef.toString() !== req.user.id) {`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`return next(errorHandler(401, 'You can delete only your listings!'));}`  
+  > &nbsp;&nbsp;`await Listing.findByIdAndDelete(req.params.id);`  
+  > &nbsp;&nbsp;`res.status(200).json({ message: 'Listing deleted successfully!' });`  
+  > `} catch (error) {next(error);}`  
+  > `};`  
+- modify profile.jsx (at client)  
+  > ...   
+  > `const handleListingDelete = async (listingId) => {`  
+  > `try {`  
+  > &nbsp;&nbsp;`const res = await fetch('/api/listing/delete/${listingId}',`   
+  > &nbsp;&nbsp;&nbsp;&nbsp;`{method: 'DELETE',});`  
+  > &nbsp;&nbsp;`const data = await res.json();`  
+  > &nbsp;&nbsp;`if (data.success === false) {console.log(data.message);`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`return;}`  
+  > &nbsp;&nbsp;`setUserListings((prev) =>`  
+  > &nbsp;&nbsp;`prev.filter((listing) => listing._id !== listingId),);`  
+  > &nbsp;&nbsp;`handleShowListings();`  
+  > `} catch (error) {console.log(error);}`  
+  > `};`  
+  > ... 
+  > `<button`  
+  > &nbsp;&nbsp;`onClick={() => handleListingDelete(listing._id)}>`  
+  > &nbsp;&nbsp;`Delete`  
+  > `</button>`  
+  > ...  
+<hr/>
+
+### (47) update user listing at server(C) and client(B)  
+- modify listing.route.js(at server)  
+  > ...  
+  > `import { updateListing, getListing} from '../controllers/listing.controller.js';`  
+  > ...  
+  > `router.post('/update/:id', verifyToken, updateListing);`  
+  > `router.get('/get/:id', getListing);`  
+  > ...  
+- modify listing.controller.js(at server)  
+  > ...  
+  > `export const updateListing = async (req, res, next) => {`  
+  > `try {`  
+  > &nbsp;&nbsp;`const listing = await Listing.findById(req.params.id);`  
+  > &nbsp;&nbsp;`if (!listing) {`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`return next(errorHandler(404, 'Listing not found!')); }`  
+  > &nbsp;&nbsp;`if (listing.userRef.toString() !== req.user.id) {`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`return next(errorHandler(401, 'You can delete only your listings!')); }`  
+  > &nbsp;&nbsp;`const updatedListing = await Listing.findByIdAndUpdate(`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`req.params.id,`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`req.body,`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`{ new: true }, );`  
+  > &nbsp;&nbsp;`res.status(200).json(updatedListing);`  
+  > `} catch (error) {`  
+  > `next(error);`  
+  > `} };`  
+  > ... 
+  > ...   
+  > `export const getListing = async (req, res, next) => {`  
+  > `try {`  
+  > `const listing = await Listing.findById(req.params.id);` 
+  > `if (!listing) {`  
+  > `return next(errorHandler(404, 'Listing not found!'));}`  
+  > `res.status(200).json(listing);`  
+  > `} catch (error) {`  
+  > `next(error);`  
+  > `} };`  
+- modify profile.jsx (at client)  
+  > ...  
+  > `<button`  
+  > `onClick={() => navigate(`/edit-listing/${listing._id}`)>`  
+  > `Edit`  
+  > `</button>`  
+  > ...  
+- add route in app.jsx as a member of PrivateRoute  
+  > ...  
+  > `import EditListing from './pages/EditListing';`  
+  > ...  
+  > `<Route element={<PrivateRoute />}>`  
+  > &nbsp;&nbsp;&nbsp;&nbsp;`<Route path="/edit-listing/:id" element={<EditListing />} />`  
+  > `</Route>`  
+  > ...   
+- create EditListing.jsx just like CreateListing.jsx but some differences 
+  > ...  
+  > `import {useParams } from 'react-router-dom';`  
+  > `export default function EditListing() {`  
+  > ...
+  > `const params = useParams();`  
+  > ...  
+  > `useEffect(() => {`  
+  > `const fetchListing = async () => {`  
+  > `const listingId = params.id;`  
+  > `const res = await fetch(`/api/listing/get/${listingId}`);`  
+  > `const data = await res.json();`  
+  > `if (data.success === false) {console.log(data.message);`  
+  > `return; }`  
+  > `setFormData(data);`  
+  > `};`  
+  > `fetchListing();},`  
+  > `[params.id]);`    
+  > ...  
+  > ...  
+  > `const handleSubmit = async (e) => {`  
+  > ...  
+  > `const res = await fetch(`/api/listing/update/${params.id}`, {`  
+  > `method: 'POST',`  
+  > `headers: {'Content-Type': 'application/json',},`  
+  > `body: JSON.stringify({ ...formData, userRef: currentUser._id }),});`  
+  > `const data = await res.json();`  
+  > ...  
+  > `navigate(`/listing/${data._id}`);`  
+  > ... 
+<hr/>
+
+### (48) detail listing page at client(B)  
+- create route in app.jsx  
+  > ...  
+  > `import Listing from './pages/Listing';`  
+  > ...  
+  > `<Route path="/listing/:listingId" element={<Listing />} />`  
+  > ...   
+- create Listing.jsx, importing useEffect, useState, useParams  
+
+### (49) add contact message at server(C) and client(B)  
+- add route for getting one user infomation in user.route.js 
+  > ...  
+  > `import {getUser} from '../controllers/user.controller.js';`
+  > ...  
+  > `router.get('/get/:id', verifyToken, getUser);`  
+  > ...  
+- add getUser function in user.controller.js  
+  > ...  
+  > `export const getUser = async (req, res, next) => {`  
+  > `try {`  
+  > &nbsp;&nbsp;`const user = await User.findById(req.params.id);`  
+  > &nbsp;&nbsp;`if (!user) {`  
+  > &nbsp;&nbsp;`return next(errorHandler(404, 'User not found!'));}`  
+  > &nbsp;&nbsp;`const { password, ...rest } = user._doc;`  
+  > &nbsp;&nbsp;`res.status(200).json(rest);`  
+  > `} catch (error) {`  
+  > &nbsp;&nbsp;`next(error);}`  
+  > `};`    
+- add contact message to listing.jsx  
+  > ...
+  > `import { useSelector } from 'react-redux';`  
+  > `import Contact from '../components/Contact';`  
+  > ...  
+  > `const Listing = () => {`  
+  > ...  
+  > `const { currentUser } = useSelector((state) => state.user);`  
+  > `const [contact, setContact] = useState(false);`  
+  > ...  
+  > `{currentUser && currentUser._id !== listing.userRef && !contact && (`  
+  > `<button onClick={() => setContact(true)} Contact Landlord</button>)}`  
+  > `{contact && <Contact listing={listing} />}`  
+  > ...  
+  > `}`  
+<hr/>
+
+### (50) add search api at server(C)  
+- add search router in listing.route.js  
+  ```javascript
+   ...  
+   import {getListings} from '../controllers/listing.controller.js'; 
+   ...  
+   router.get('/get', getListings);
+- add search function in listing.controller.js  
+  ```javascript
+  ...  
+  export const getListings = async (req, res, next) => {  
+    try {  
+      const limit = parseInt(req.query.limit) || 9;  
+      const startIndex = parseInt(req.query.startIndex) || 0;  
+      let offer = req.query.offer;  
+      if (offer === undefined || offer === 'false') {  
+        offer = { $in: [false, true] };}
+      let furnished = req.query.furnished;
+      if (furnished === undefined || furnished === 'false') {  
+        furnished = { $in: [false, true] };}  
+      let parking = req.query.parking; 
+      if (parking === undefined || parking === 'false') {
+        parking = { $in: [false, true] };} 
+      let type = req.query.type; 
+      if (type === undefined || type === 'all') {
+        type = { $in: ['sale', 'rent'] };} 
+      const searchTerm = req.query.searchTerm || '';  
+      const sort = req.query.sort || 'createdAt';  
+      const order = req.query.order || 'desc';  
+      const listings = await Listing.find({  
+        name: { $regex: searchTerm, $options: 'i' },  
+        offer,  
+        furnished,  
+        parking,  
+        type,})  
+      .sort({ [sort]: order })  
+      .limit(limit)  
+      .skip(startIndex);  
+      return res.status(200).json(listings);  
+    } catch (error) {  
+      next(error);}};
+- test using insomnia
+<hr/>
+
+### (51) header search form at client(B)  
+- add function in Header.jsx  
+  ```javascript
+  ...  
+  import { Link, useNavigate } from 'react-router-dom';  
+  import { useEffect, useState } from 'react';  
+  ...  
+  export default function Header() {  
+  ...  
+  const [searchTerm, setSearchTerm] = useState('');  
+  const navigate = useNavigate();  
+  const handleSubmit = (e) => {  
+    e.preventDefault();  
+    const urlParams = new URLSearchParams(window.location.search);  
+    urlParams.set('searchTerm', searchTerm);  
+    const urlQuery = urlParams.toString();  
+    navigate('/search?${urlQuery}');};  
+    useEffect(() => {  
+      const urlParams = new URLSearchParams(location.search);  
+      const searchTermFromUrl = urlParams.get('searchTerm');  
+      if (searchTermFromUrl) {  
+      setSearchTerm(searchTermFromUrl);} }, []);  
+  return (  
+    ...  
+    <form onSubmit={handleSubmit}>  
+    ...  
+    <input  
+      type="text"  
+      placeholder="Search"  
+      value={searchTerm}  
+      onChange={(e) => setSearchTerm(e.target.value)}  
+    ...  
+  ) }
+<hr /> 
+
+### (52) add search page at client(B)  
+- add route in app.jsx
+  ```javascript
+  ...  
+  import Search from './pages/Search';  
+  ...  
+  <Route path="/search" element={<Search />} />  
+  ...
+- create Search.jsx  
+
+### (53) add more page view at client(B)  
+
+
+
+
+
+
+
+
+
+
+# 【ETC】   
+### ✓ work at various PCs(A → A and B)   
+- B> git clone "github_address" (Just once at first)  
+  - project_dir> npm install(each package.json)  
+  - project_dir> make and code .env  
+  - coding  
+  - git add, commit, and push  
+- afterwards both A and B do the next process  
+  - git pull origin main  
+  - git add .  
+  - git commit -m "work of A(or B)"  
+  - git push origin main  
+- always "git push" when get off work, always "git pull" when start work  
+
+### ✓ mrkdown syntax  
+- can use HTML, but why?  
+  <h3 style="color:red">hello</h3>
+- To create new line, end a line with two or more spaces, and then type return. <br/> or use br tag instead  
+- bold : **hello**  
+- italic : _hello_  
+- bold and italic : **_hello_**  
+- blockquotes  
+  > Hello  
+  > World  
+- nestedquotes  
+  > Hello  
+  > > World  
+- To add another element in a list while preserving the continuity of the list, indent the element four spaces or one tab.  
+  > hello  
+- using '\&nbsp;' for indenting or spacing   
+   h&nbsp;&nbsp;e&nbsp;&nbsp;l&nbsp;&nbsp;l&nbsp;&nbsp;o  
+- Code blocks are normally indented four spaces or one tab. When they’re in a list, indent them eight spaces or two tab  
+- images:  
+![image1](client/public/byh.jpg)  
+![Image2](https://github.com/user-attachments/assets/af165e4b-b509-4425-a77e-1521621eea5f)  
+- code : `print("hello")`  
+- link : [google](https://google.com)  
+- url and e-mail : <https://www.google.com>
+  <aaa@gmail.com>  
