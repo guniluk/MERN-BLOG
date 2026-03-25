@@ -143,6 +143,30 @@
 ```
 <hr/>
 
+- create routes folder and route file(user.route.js) in C folder(api)
+```javascript   
+  import express from 'express';   
+  import { test } from '../controllers/user.controller.js';   
+  const router = express.Router();   
+  router.get('/test', test);   
+  export default router;     
+```
+- create controllers folder and controller file(user.controller.js) in C folder(api)  
+```javascript
+  export const test = (req, res) => {   
+  res.json({ message: 'Test API route working!' });   
+  }; 
+``` 
+- connect routes in index.js   
+```javascript
+  import userRouter from './routes/user.route.js';   
+  app.use('/api/users', userRouter);
+```  
+<hr />
+
+
+
+
 ### (27) auth(signup) procedure (server(C)/Insomnia/MongoDB)  
 - make auth.route.js in routes folder  
   > `import express from 'express';`  
@@ -1078,28 +1102,6 @@ the end of signup, login, logout
   > `git add .`   
   > `git commit -m "~~~"`   
   > `git push`  
-<hr />
-
-### Make Routes in server(C)  
-- create routes folder and route file(user.route.js) in C folder(api)
-```javascript   
-  import express from 'express';   
-  import { test } from '../controllers/user.controller.js';   
-  const router = express.Router();   
-  router.get('/test', test);   
-  export default router;     
-```
-- create controllers folder and controller file(user.controller.js) in C folder(api)  
-```javascript
-  export const test = (req, res) => {   
-  res.json({ message: 'Test API route working!' });   
-  }; 
-``` 
-- connect routes to index.js   
-```javascript
-  import userRouter from './routes/user.route.js';   
-  app.use('/api/users', userRouter);
-```  
 <hr />
 
 ### ✓ mrkdown syntax  
