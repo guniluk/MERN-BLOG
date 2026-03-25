@@ -4,8 +4,8 @@
 
 1. create project folder A(fullstack)   
 2. install react at B(client) folder  
-  - A> `npm create vite@latest (B)`  
-  - A> `cd B`  
+  > A> `npm create vite@latest (B)`  
+  > A> `cd B`  
 3. install tailwind as below procedure(at B)         
   - search 'tailwind vite' in google(https://tailwindcss.com)    
   - select 'Installing Tailwind CSS with vite' site  
@@ -28,7 +28,7 @@
     > `npm i react-router-dom`  
   - create "pages" folder in "src" folder of B(client), and make pages(Home.jsx, etc)  
   - modify app.jsx  
-    ```javascript
+```javascript
     import { BrowserRouter, Routes, Route } from 'react-router-dom';  
     import Home from './pages/Home';    
     function App() {
@@ -41,22 +41,25 @@
       )
     }
     export default App
-- (24) create "components" folder in "src" folder of B(client), and make components(Header.jsx)  
-  - apply tailwind css    
-  - navigate using "Link"  
-    > `import { Link } from 'react-router-dom';`    
-    > &nbsp;&nbsp;`<Link to="/">`   
-    > &nbsp;&nbsp;&nbsp;&nbsp;`<li className="hidden sm:inline text-slate-700 hover:underline">`    
-    >  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`Home`   
-    >  &nbsp;&nbsp;&nbsp;&nbsp;`</li>`   
-    > &nbsp;&nbsp;`</Link>`    
-- (25) modify app.jsx (include "Header" component)  
-  > `<BrowserRouter>`  
-  > `<Header />`  
-  > `<Routes>`  
-  > `<Route path="/" element={} />`   
-  > `</Routes>`   
-  > `</BrowserRouter>`  
+```
+7. create "components" folder in "src" folder, and make components(Header.jsx)  
+  - googling 'flowbite react'(https://flowbite-react.com/), go to 'Quickstart' and excute the 'Adding to an existing project' command  
+  - install react-icons(npm i react-icons) 
+  - edit Header.jsx 
+```javascript
+
+```
+1. modify app.jsx (include "Header" component)   
+```javascript
+  ...
+  <BrowserRouter>  
+    <Header />  
+    <Routes>  
+      <Route path="/" element={} />   
+    </Routes>   
+  </BrowserRouter> 
+```
+<hr/>
 
 ## ◼︎ Express   
 - (6) go to project folder A(fullstack)  
