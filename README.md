@@ -121,24 +121,26 @@
 21.  add ".env" in ".gitignore"   
   <hr/>  
 
-- (26) create "models" folder in C folder(api) and make schema and model(user.model.js)   
-  > `import mongoose from 'mongoose';`    
-  > `const userSchema = new mongoose.Schema(`       
-  > `{`      
-  > &nbsp; &nbsp;`username: {`      
-  > &nbsp; &nbsp;&nbsp; &nbsp;`type: String,`      
-  > &nbsp; &nbsp;&nbsp; &nbsp;`required: true,`      
-  > &nbsp; &nbsp;&nbsp; &nbsp;`unique: true,`      
-  > &nbsp; &nbsp;`},`      
-  > &nbsp; &nbsp;`password: {`     
-  > &nbsp; &nbsp;&nbsp; &nbsp;`type: String,`    
-  > &nbsp; &nbsp;&nbsp; &nbsp;`required: true,`   
-  > &nbsp; &nbsp;`},`   
-  > `},`   
-  > &nbsp; &nbsp;`{ timestamps: true },`   
-  > `);`   
-  > `const User = mongoose.model('User', userSchema);`   
-  > `export default User;`     
+22. create "models" folder in C folder(api) and make schema and model(user.model.js) 
+```javascript  
+  import mongoose from 'mongoose';    
+  const userSchema = new mongoose.Schema(       
+  {      
+    username: {      
+      type: String,      
+      required: true,      
+      unique: true,      
+    },      
+    password: {     
+      type: String,    
+      required: true,   
+    },   
+  },   
+  { timestamps: true },   
+  );   
+  const User = mongoose.model('User', userSchema);   
+  export default User;     
+```
 <hr/>
 
 ### (27) auth(signup) procedure (server(C)/Insomnia/MongoDB)  
