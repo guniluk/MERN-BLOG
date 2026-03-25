@@ -42,14 +42,13 @@
     }
     export default App
 ```
+<hr/>
+
 7. create "components" folder in "src" folder, and make components(Header.jsx)  
   - googling 'flowbite react'(https://flowbite-react.com/), go to 'Quickstart' and excute the 'Adding to an existing project' command  
   - install react-icons(npm i react-icons) 
   - edit Header.jsx 
-```javascript
-
-```
-1. modify app.jsx (include "Header" component)   
+  - modify app.jsx (include "Header" component)   
 ```javascript
   ...
   <BrowserRouter>  
@@ -62,26 +61,37 @@
 <hr/>
 
 ## ◼︎ Express   
-- (6) go to project folder A(fullstack)  
-- (7) init npm : A>`npm init -y`  
-- (8) install express(in A folder)  
+8. go to project folder A(fullstack)  
+9. init npm : A>`npm init -y`  
+10. install express(in A folder)  
   > A>`npm i express`  
-- (9) install nodemon : A>`npm i nodemon -D`   
+11. install nodemon : A>`npm i nodemon -D`   
   - if globally installed before, it doesn't need to install again  
-- (10) modify package.json    
-  > `"type": "module"`   
-  > `"scripts": {`    
-  > &nbsp;&nbsp;&nbsp;&nbsp;`"dev": "nodemon api/index.js",`   
-  > &nbsp;&nbsp;&nbsp;&nbsp;`"start": "node api/index.js"}`    
-- (11) create server folder C(api) in A      
-- (12) make "index.js" at C folder  
-  > `import express from 'express';`    
-  > `const app = express();`    
-  > `app.use(express.json());`  
-  > `const port = 3000;`   
-  > `app.listen(port, () => {`    
-  > `console.log(`Server is running on port ${port}`) });`  
-- (13) create routes folder and route file(user.route.js) in C folder(api)   
+12. modify package.json  
+  ```json
+  {
+    "main": "api/index.js",
+    "scripts": {
+      "dev": "nodemon api/index.js",
+      "start": "node api/index.js"},
+    "type": "module" 
+  }
+  ```
+13. move ".gitignore" in B(client) to A     
+  - check if "node_modules", ".env" in ".gitignore"  
+14.  create server folder C(api) in A      
+15.  make "index.js" at C folder  
+```javascript
+  import express from 'express';    
+  const app = express();    
+  app.use(express.json());  
+  const port = 3000;   
+  app.listen(port, () => {    
+  console.log(`Server is running on port ${port}`) });  
+```
+<hr/>
+
+1.  create routes folder and route file(user.route.js) in C folder(api)   
   > `import express from 'express';`   
   > `import { test } from '../controllers/user.controller.js';`   
   > `const router = express.Router();`   
@@ -95,15 +105,7 @@
 - (15) connect routes to index.js     
   > `import userRouter from './routes/user.route.js';`   
   > `app.use('/api/users', userRouter);`  
-#### (16) Change git folder (B → A)  
-- B(client)> `mv .git ../`  
-- move ".gitignore" in B to A     
-  - check & add "node_modules", ".env" to ".gitignore"  
-- move "README md file" in B to A(if exists)  
-- git commit & push(at A folder)  
-  > `git add .`   
-  > `git commit -m "~~~"`   
-  > `git push`  
+
 <hr />
 
 ## ◼︎ MongoDB  
@@ -1076,6 +1078,16 @@ the end of signup, login, logout
   - git commit -m "work of A(or B)"  
   - git push origin main  
 - always "git push" when get off work, always "git pull" when start work  
+
+### ✓Change git folder (B → A)  
+- B(client)> `mv .git ../`  
+- move ".gitignore" in B to A     
+  - check & add "node_modules", ".env" to ".gitignore"  
+- move "README md file" in B to A(if exists)  
+- git commit & push(at A folder)  
+  > `git add .`   
+  > `git commit -m "~~~"`   
+  > `git push`  
 
 ### ✓ mrkdown syntax  
 - can use HTML, but why?  

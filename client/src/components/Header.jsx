@@ -40,7 +40,9 @@ export default function Header() {
           <FaMoon />
         </Button>
         <Link to="/sign-in">
-          <Button color="yellow">Sign In</Button>
+          <Button className=" bg-blue-100 text-blue-900 text-semibold hover:bg-blue-200! focus:ring-blue-300!">
+            Sign In
+          </Button>
         </Link>
         <NavbarToggle />
       </div>
