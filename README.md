@@ -91,49 +91,36 @@
 ```
 <hr/>
 
-1.  create routes folder and route file(user.route.js) in C folder(api)   
-  > `import express from 'express';`   
-  > `import { test } from '../controllers/user.controller.js';`   
-  > `const router = express.Router();`   
-  > `router.get('/test', test);`   
-  > `export default router;`     
-- (14) create controllers folder and controller file(user.controller.js) in C folder(api)   
-  > `export const test = (req, res) => {`   
-  > &nbsp;&nbsp;`res.json({ message: 'Test API route working!' });`   
-  > `};`  
-
-- (15) connect routes to index.js     
-  > `import userRouter from './routes/user.route.js';`   
-  > `app.use('/api/users', userRouter);`  
-
-<hr />
-
-## ◼︎ MongoDB  
-- (17) install mongoose at A(fullstack)   
-  > A> `npm i mongoose`   
-- (18) At MongoDB site, create new project  
+## ◼︎ MongoDB   
+16.  At MongoDB site, create new project  
   - input project name(fullstack)   
   - change or confirm username, password and click create user  
   - choose connectton method → select Drivers  
   - At mongoDB site, select NETWORK ACCESS, IP Acess List, Add IP Adress    
     Access List Entry: 0.0.0.0, Comment:test   
-- (19) create ".env" file in A(fullstack)  
-  > `MONGO = "Mongodb_site_url"`  
-- (20) install "dotenv" at A(fullstack)  
-  > `npm i dotenv`  
-- (21) Add connection string into "index.js"  
-    > `import mongoose from 'mongoose';`  
-    > `import dotenv from 'dotenv';`  
-    > `dotenv.config();`  
-    > `mongoose`  
-    > `.connect(process.env.MONGO)`  
-    > `.then(() => {`  
-    > `console.log('Connected to MongoDB!');})`  
-    > `.catch((err) => {`  
-    > `console.error('Error connecting to MongoDB:', err);});`  
-- (22) add ".env" to ".gitignore"  
-  > .env  
+17.  create ".env" file in A(fullstack)  
+```json
+  MONGO = "Mongodb_site_url(add project name before '?')"
+```  
+18. install mongoose at A(fullstack)   
+  > A> `npm i mongoose`  
+19.   install "dotenv" at A(fullstack)  
+  > A> `npm i dotenv`  
+20. Add connection DB in "index.js"  
+```javascript
+  import mongoose from 'mongoose';  
+  import dotenv from 'dotenv';  
+  dotenv.config();  
+  mongoose  
+    .connect(process.env.MONGO)  
+    .then(() => {  
+      console.log('Connected to MongoDB!');})  
+    .catch((err) => {  
+      console.error('Error connecting to MongoDB:', err);});
+```  
+21.  add ".env" in ".gitignore"   
   <hr/>  
+
 - (26) create "models" folder in C folder(api) and make schema and model(user.model.js)   
   > `import mongoose from 'mongoose';`    
   > `const userSchema = new mongoose.Schema(`       
@@ -1078,6 +1065,7 @@ the end of signup, login, logout
   - git commit -m "work of A(or B)"  
   - git push origin main  
 - always "git push" when get off work, always "git pull" when start work  
+<hr />
 
 ### ✓Change git folder (B → A)  
 - B(client)> `mv .git ../`  
@@ -1088,6 +1076,29 @@ the end of signup, login, logout
   > `git add .`   
   > `git commit -m "~~~"`   
   > `git push`  
+<hr />
+
+### Make Routes in server(C)  
+- create routes folder and route file(user.route.js) in C folder(api)
+```javascript   
+  import express from 'express';   
+  import { test } from '../controllers/user.controller.js';   
+  const router = express.Router();   
+  router.get('/test', test);   
+  export default router;     
+```
+- create controllers folder and controller file(user.controller.js) in C folder(api)  
+```javascript
+  export const test = (req, res) => {   
+  res.json({ message: 'Test API route working!' });   
+  }; 
+``` 
+- connect routes to index.js   
+```javascript
+  import userRouter from './routes/user.route.js';   
+  app.use('/api/users', userRouter);
+```  
+<hr />
 
 ### ✓ mrkdown syntax  
 - can use HTML, but why?  
