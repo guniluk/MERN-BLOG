@@ -218,32 +218,40 @@
 - send POST request at Insomnia for other user, and in Mongo DB site, check new user is created with encrypted password  
 <hr/>  
 
-### (28) middleware handling errors (Server(C))
+24. middleware handling errors (Server(C))
 - add middleware to handle errors in index.js
-  > `app.use((err, req, res, next) => {`  
-  > `const statusCode = err.statusCode || 500;`  
-  > `const message = err.message || 'Internal Server Error';`  
-  > `return res.status(statusCode).json({`  
-  > &nbsp;&nbsp;`success: false,`  
-  > &nbsp;&nbsp;`statusCode,`  
-  > &nbsp;&nbsp;`message,`  
-  > &nbsp;&nbsp;`});`  
-  > `});`  
+  ```javascript
+  app.use((err, req, res, next) => {  
+    const statusCode = err.statusCode || 500;  
+    const message = err.message || 'Internal Server Error';  
+    return res.status(statusCode).json({  
+      success: false,  
+      statusCode,  
+      message,  
+      });  
+  }); 
+  ```
 - modify controller file(auth.controller.js)  
-  > `export const signup = async (req, res, next) => {`  
-  > &nbsp;&nbsp;`catch (err) {`  
-  > &nbsp;&nbsp;`next(err);`  
-  > &nbsp;&nbsp;`}`  
-  > `};`  
-### (29) handling errors manually if needed (Server (C))
+  ```javascript
+  export const signup = async (req, res, next) => {  
+    ...
+    catch (err) {  
+      next(err);  
+    }  
+  }; 
+  ``` 
+25. handling errors manually if needed (Server (C))
 - make "utils" folder and "error.js"
-> `export const errorHandler = (statusCode, message) => {`  
->  `const error = new Error();`  
->  `error.message = message;`  
->  `error.statusCode = statusCode;`  
->  `return error;`  
-> `};`  
+```javascript
+  export const errorHandler = (statusCode, message) => {  
+    const error = new Error();  
+    error.message = message;  
+    error.statusCode = statusCode;  
+  return error;  
+  };
+```  
 - use if needed in controller or other file  
+
 ### (30) auth(sign-up) procedure  (Client (B))  
 - make form in "SignUp.jsx" page  
   > `import { useState } from 'react';`  
