@@ -164,49 +164,57 @@
 ```  
 <hr />
 
-
-
-
-### (27) auth(signup) procedure (server(C)/Insomnia/MongoDB)  
+23. auth(signup) procedure (server(C)/Insomnia/MongoDB)  
 - make auth.route.js in routes folder  
-  > `import express from 'express';`  
-  > `import { signup } from '../controllers/auth.controller.js';`    
-  > `const router = express.Router();`   
-  > `router.post('/signup', signup);`    
-  > `export default router;`    
+```javascript
+  import express from 'express';  
+  import { signup } from '../controllers/auth.controller.js';    
+  const router = express.Router();   
+  router.post('/signup', signup);    
+  export default router;
+```    
 - make auth.controller.js in controllers folder  
-  > `import User from '../models/user.model.js';`  
-  > `export const signup = async (req, res) => {`  
-  > `const { username, email, password } = req.body;`  
-  > `const newUser = new User({ username, email, password });`  
-  > `try {`  
-  > &nbsp;&nbsp;`await newUser.save();`  
-  > &nbsp;&nbsp;`res.status(201).json({ message: 'User created successfully!' });`  
-  > `} catch (err) {`  
-  > &nbsp;&nbsp;`console.error('Error creating user:', err);`  
-  > &nbsp;&nbsp;`return res.status(500).json({ message: 'Internal server error' });`  
-  > `}`   
-  > `};`   
+```javascript
+  import User from '../models/user.model.js';  
+  export const signup = async (req, res) => {  
+    const { username, email, password } = req.body;  
+    const newUser = new User({ username, email, password });  
+    try {  
+      await newUser.save();  
+      res.status(201).json({ message: 'User created successfully!' });  
+    } catch (err) {  
+      console.error('Error creating user:', err);  
+    return res.status(500).json({ message: 'Internal server error' });  
+    }   
+  };
+```   
 - connect auth.route.js to index.js   
-  > `import authRouter from './routes/auth.route.js';`  
-  > `app.use('/api/auth', authRouter);`  
+```javascript
+  import authRouter from './routes/auth.route.js';  
+  app.use('/api/auth', authRouter);  
+```
 - send POST request at Insomnia
   > POST : localhost:3000/api/auth/signup  
   > BODY(JSON)  
-    `{`  
-	  `"username" : "test",`
-	  `"email" : "test@test.com",`
-	  `"password" : "test1"`
-	  `}`  
+```json
+    {  
+	    "username" : "test",
+	    "email" : "test@test.com",
+	    "password" : "test1"
+	  }
+```  
 - in Mongo DB site, check new user is created   
 - install bcryptjs at A(fullstack) for password encryption  
   > A> `npm i bcryptjs`  
 - modify auth.controller.js  
-  > `import bcryptjs from 'bcryptjs';`  
-  > `export const signup = async (req, res) => {`  
-  > `const { username, email, password } = req.body;`  
-  > `const hashedPassword = bcrypt.hashSync(password, 10);`  
-  > `const newUser = new User({ username, email, password: hashedPassword });`   
+```javascript
+  import bcryptjs from 'bcryptjs';  
+  export const signup = async (req, res) => {  
+    const { username, email, password } = req.body;  
+    const hashedPassword = bcryptjs.hashSync(password, 10);  
+    const newUser = new User({ username, email, password: hashedPassword });
+  }
+```   
 - send POST request at Insomnia for other user, and in Mongo DB site, check new user is created with encrypted password  
 <hr/>  
 
