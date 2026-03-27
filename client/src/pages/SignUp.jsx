@@ -45,9 +45,9 @@ export default function SignUp() {
     }
   };
   return (
-    <div className="mt-5 min-h-screen flex">
-      <div className="flex flex-col gap-5 p-3 max-w-3xl mx-auto md:flex-row md:items-center">
-        {/* left side */}
+    <div className="min-h-screen mt-20">
+      {/* left side */}
+      <div className="flex flex-col gap-10 p-3 max-w-3xl mx-auto md:flex-row md:items-center">
         <div className="flex-1">
           <Link
             to="/"

@@ -304,45 +304,63 @@
 - send Form message at Fronted(B)  and check if user is created in the DB  
 <hr/>
 
-### (31) loading & error handling (Client (B) page(signUp.jsx))  
+27. loading & error handling (signUp.jsx)  
 - set disalbed attribute when loading, and set error message and display when error. when normal, navigate to sign-in page 
-  > ...
-  > `import { Link, useNavigate } from 'react-router-dom';`  
-  > `export default function SignUp() {`  
-  > `const [error, setError] = useState(null);`  
-  > `const [loading, setLoading] = useState(false);`  
-  > `const navigate = useNavigate();`  
-  > ...
-  > `const handleSubmit = async (e) => {`  
-    > `e.preventDefault();`  
-    > `try {`  
-    >  &nbsp;&nbsp;`setLoading(true);`  
-    >  &nbsp;&nbsp;`const res = await fetch('/api/auth/signup', {`  
-    >    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`method: 'POST', headers: {'Content-Type': 'application/json',},`  
-    >    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`body: JSON.stringify(formData)});`  
-    >  `const data = await res.json();`  
-    >  `if (data.success === false) {`  
-    >    &nbsp;&nbsp;&nbsp;&nbsp;`setLoading(false);`  
-    >    &nbsp;&nbsp;&nbsp;&nbsp;`setError(data.message);`  
-    >    &nbsp;&nbsp;&nbsp;&nbsp;`return;}`  
-    >  `setLoading(false);`  
-    >  `setError(null);`
-    >  `setFormData({});`  
-    >  `navigate('/sign-in');`  
-    >`} catch (error) {`  
-    >  &nbsp;&nbsp;&nbsp;&nbsp;`setLoading(false);`  
-    >  &nbsp;&nbsp;&nbsp;&nbsp;`setError(error.message);`  
-    >`}`  
-  > `return (`  
-  > ...
-  >   &nbsp;&nbsp;&nbsp;&nbsp;`<button disabled={loading}>`  
-  >     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `{loading ? 'Signing up...' : 'Sign Up'}`  
-  >  &nbsp;&nbsp;&nbsp;&nbsp; `</button>`  
-  >   &nbsp;&nbsp;&nbsp;&nbsp; `{error && (<div> {error} </div>)}`  
-  > ...
-  >`)`  
-  > `}`  
+```javascript
+  import { Link, useNavigate } from 'react-router-dom'; 
+  export default function SignUp() {  
+    const [error, setError] = useState(null); 
+    const [loading, setLoading] = useState(false);  
+    const navigate = useNavigate();  
+    ...
+    const handleSubmit = async (e) => {  
+      e.preventDefault();  
+      try {  
+        setLoading(true); 
+        const res = await fetch('/api/auth/signup', {  
+          method: 'POST', 
+          headers: {'Content-Type': 'application/json',},  
+          body: JSON.stringify(formData)});  
+        const data = await res.json();  
+        if (data.success === false) {  
+          setLoading(false);  
+          setError(data.message);  
+          return;}  
+        setLoading(false);  
+        setError(null);
+        setFormData({});  
+        navigate('/sign-in');  
+      } catch (error) {  
+        setLoading(false);  
+        setError(error.message); 
+      } 
+      return (  
+        ..
+        <button disabled={loading}>  
+          {loading ? 'Signing up...' : 'Sign Up'}  
+        </button>  
+        {error && (<div> {error} </div>)}  
+        ...
+      ) 
+    }
+  }  
+  
+```
 <hr/>
+
+28. create Footer components (client B)
+- add Footer route in App.jsx  
+```javascript
+  <BrowserRouter>
+  <Header />
+  <Routes>
+    <Route path="/" element={<Home />} />
+  </Routes>
+  <FooterCom />
+</BrowserRouter>
+```
+- make Footer.jsx in components folder  
+
 
 ### (32) sign-in procedure (api(C))  
 - install "jsonwebtoken" at A(fullstack)  
