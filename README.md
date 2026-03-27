@@ -251,52 +251,59 @@
   };
 ```  
 - use if needed in controller or other file  
+<hr/>
 
-### (30) auth(sign-up) procedure  (Client (B))  
-- make form in "SignUp.jsx" page  
-  > `import { useState } from 'react';`  
-  > `export default function SignUp() {`  
-  > `const [formData, setFormData] = useState({});`<br/>
-  > `const handleChange = (e) => {`  
-  > &nbsp;&nbsp;`setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));`  
-  > `};`<br/>  
-  > `const handleSubmit = async (e) => {`  
-  > &nbsp;&nbsp;`e.preventDefault();`  
-  > &nbsp;&nbsp;`const res = await fetch('/api/auth/signup', {`  
-  > &nbsp;&nbsp;   `method: 'POST',`  
-  > &nbsp;&nbsp;   `headers: {`  
-  > &nbsp;&nbsp;     `'Content-Type': 'application/json',`  
-  > &nbsp;&nbsp;   `},`  
-  > &nbsp;&nbsp;   `body: JSON.stringify(formData),`  
-  > &nbsp;&nbsp; `});`  
-  > &nbsp;&nbsp; `const data = await res.json();`  
-  > &nbsp;&nbsp; `setFormData({});`  
-  > &nbsp;&nbsp;`};`<br/>  
-  > `return (`  
-  > `<div>`  
-  >&nbsp;&nbsp;    `<h1>Sign Up</h1>`  
-  >&nbsp;&nbsp;    `<form. onSubmit={handleSubmit}>`  
-  >&nbsp;&nbsp;      `<input id="username" onChange={handleChange} />`  
-  >&nbsp;&nbsp;      `<input id="email" onChange={handleChange} />`  
-  >&nbsp;&nbsp;      `<input id="password" onChange={handleChange} />`  
-  >&nbsp;&nbsp;      `<button> Sign Up </button>`  
-  >&nbsp;&nbsp;    `</form>`  
-  > `</div>`  
-  > `);`  
-  > `}`   
+26. auth(sign-up) procedure  (Client (B))  
+- make form in "SignUp.jsx" page 
+```javascript
+  import { useState } from 'react';  
+  export default function SignUp() {  
+    const [formData, setFormData] = useState({});
+    const handleChange = (e) => {  
+      setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));  
+    }; 
+    const handleSubmit = async (e) => {  
+      e.preventDefault();  
+      const res = await fetch('/api/auth/signup', {  
+        method: 'POST',  
+        headers: {  
+          'Content-Type': 'application/json', 
+        },  
+        body: JSON.stringify(formData),  
+      });  
+      const data = await res.json();  
+      setFormData({});  
+    };
+    return (  
+    <div>  
+      <h1>Sign Up</h1>  
+        <form onSubmit={handleSubmit}>  
+          <input id="username" onChange={handleChange} />  
+          <input id="email" onChange={handleChange} />  
+          <input id="password" onChange={handleChange} />  
+          <button> Sign Up </button>  
+        </form>  
+    </div>  
+    );  
+  }
+```   
 - set proxy at vite.config.js  
-> `server: {`  
-> &nbsp;&nbsp;`proxy: {`  
-> &nbsp;&nbsp;&nbsp;&nbsp;`'/api': {`  
-> &nbsp;&nbsp;&nbsp;&nbsp;`target: 'http://localhost:3000',`  
-> &nbsp;&nbsp;&nbsp;&nbsp;`secure: false,`  
-> &nbsp;&nbsp;&nbsp;&nbsp;`},`  
-> &nbsp;&nbsp;`},`  
-> `},`  
+```javascript
+  server: {  
+    proxy: {  
+      '/api': {  
+        target: 'http://localhost:3000',  
+        secure: false,  
+      },  
+    },  
+  },
+```  
 - run both frontend and backend :   
   > B(client)> `npm run dev`
   > A(server, not C)> `npm run dev`
-- send Form message at Fronted(B)  and check if it is created in the DB  
+- send Form message at Fronted(B)  and check if user is created in the DB  
+<hr/>
+
 ### (31) loading & error handling (Client (B) page(signUp.jsx))  
 - set disalbed attribute when loading, and set error message and display when error. when normal, navigate to sign-in page 
   > ...
