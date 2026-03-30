@@ -360,45 +360,54 @@
 </BrowserRouter>
 ```
 - make Footer.jsx in components folder  
+<hr/>
 
-
-### (32) sign-in procedure (api(C))  
+29. sign-in procedure (api(C))  
 - install "jsonwebtoken" at A(fullstack)  
   > A> `npm i jsonwebtoken`  
 - add sign-in function in "auth.controller.js"  
-  > ...  
-  > `import { errorHandler } from '../utils/error.js';`  
-  > `import jwt from 'jsonwebtoken';`  
-  > ...
-  > `export const signin = async (req, res, next) => {`  
-  > `const { email, password } = req.body;`  
-  > `try {`  
-  > &nbsp;&nbsp; `const validUser = await User.findOne({ email });`  
-  > &nbsp;&nbsp; `if (!validUser) {`  
-  > &nbsp;&nbsp; `  return next(errorHandler(404, 'User not found!'));}`  
-  > &nbsp;&nbsp; `const isPasswordValid = bcryptjs.compareSync(password, validUser.password);`  
-  > &nbsp;&nbsp; `if (!isPasswordValid) {`  
-  > &nbsp;&nbsp; `  return next(errorHandler(401, 'Invalid password!'));}`  
-  > &nbsp;&nbsp; `const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);`  
-  > &nbsp;&nbsp; `const { password: pass, ...rest } = validUser._doc;`  
-  > &nbsp;&nbsp; `res.cookie('access_token', token, {httpOnly: true,`  
-  > &nbsp;&nbsp; `    expire: new Date(Date.now() + 1000 * 60 * 60 * 24)})`  
-  > &nbsp;&nbsp; `   .status(200).json(rest);`  
-  >  `} catch (error) {next(error);}`  
-  > `}`  
+```javascript
+  ...  
+  import { errorHandler } from '../utils/error.js';  
+  import jwt from 'jsonwebtoken';  
+  ...
+  export const signin = async (req, res, next) => {  
+    const { email, password } = req.body;  
+    try {  
+      const validUser = await User.findOne({ email });  
+      if (!validUser) {  
+        return next(errorHandler(404, 'User not found!'));}  
+      const isPasswordValid = bcryptjs.compareSync(password, validUser.password);  
+      if (!isPasswordValid) {  
+        return next(errorHandler(401, 'Invalid password!'));}  
+      const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);  
+      const { password: pass, ...rest } = validUser._doc;  
+      res.cookie('access_token', token, {httpOnly: true,  
+          expire: new Date(Date.now() + 1000 * 60 * 60 * 24)}) 
+        .status(200).json(rest);  
+    } catch (error) {next(error);} 
+  }
+```
 - add 'signin" route to "auth.route.js"  
-  >`...`  
-  >`import { signup, signin } from '../controllers/auth.controller.js';`  
-  >`router.post('/signin', signin);`  
-  >`...`  
-- there no coding in "index.js", because middleware is already included
-  > `import authRouter from './routes/auth.route.js';`  
-  > `app.use('/api/auth', authRouter);`  
+```javascript
+  ... 
+  import { signup, signin } from '../controllers/auth.controller.js';  
+  router.post('/signin', signin);  
+  ...
+```  
+- no coding in "index.js", because middleware is already included
+```javascript
+  import authRouter from './routes/auth.route.js';  
+  app.use('/api/auth', authRouter);
+```  
 - at insomnia, try login and see the result(check if password is not included, and token is created )  
   > POST : lcalhost:3000/api/auth/signin  
   > BODY(JSON) :  
   > {"email" : "bbb@bbb.com", "password" : "bbb"}  
-### (33) make signin.jsx page in client(B), much like signUp.jsx(copy and modify) 
+<hr />
+
+
+30. make signin.jsx page in client(B), much like signUp.jsx(copy and modify) 
 <hr/>
 
 ### (34)  Redux(globally (data) state managing, substitute for useContext) : possibly use received data(`res.json(rest)`) from "auth.controller.js"(server) at every Client(B) pages    
