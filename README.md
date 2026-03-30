@@ -407,10 +407,10 @@
 <hr />
 
 
-30. make signin.jsx page in client(B), much like signUp.jsx(copy and modify) 
+30. make signin.jsx page in client(B), much like signUp.jsx(copy and modify) and test if it is logged-in 
 <hr/>
 
-### (34)  Redux(globally (data) state managing, substitute for useContext) : possibly use received data(`res.json(rest)`) from "auth.controller.js"(server) at every Client(B) pages    
+31.  Redux(globally (data) state managing, substitute for useContext) : possibly use received data(`res.json(rest)`) from "auth.controller.js"(server) at every Client(B) pages    
 - install redux toolkit at B(client)  
   > B> `npm i @reduxjs/toolkit react-redux`  
 - create folder and file: src/redux/store.js  
