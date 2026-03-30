@@ -414,87 +414,97 @@
 - install redux toolkit at B(client)  
   > B> `npm i @reduxjs/toolkit react-redux`  
 - create folder and file: src/redux/store.js  
-- code store.js  
-  > `import { configureStore } from '@reduxjs/toolkit';`  
-  > `export const store = configureStore({`  
-  > `reducer: {},`  
-  > `middleware: (getDefaultMiddleware) =>`  
-  > `getDefaultMiddleware({serializableCheck: false,}),`  
-  > `});`  
+- code store.js
+```javascript  
+  import { configureStore } from '@reduxjs/toolkit'; 
+  export const store = configureStore({  
+  reducer: {},  
+  middleware: (getDefaultMiddleware) =>  
+  getDefaultMiddleware({serializableCheck: false,}),  
+  });  
+```
 - modify "main.jsx"   
-  > `import { Provider } from 'react-redux';`  
-  > `import { store } from './redux/store';`  
-  > ...  
-  > `<Provider store={store}>`  
-  > `<App />`  
-  > `</Provider>`    
+```javascript
+  import { Provider } from 'react-redux'; 
+  import { store } from './redux/store';  
+  ...  
+  <Provider store={store}>  
+  <App /> 
+  </Provider>   
+```
 - create a Redux Static Slice  
    - make folder("user") in "redux" folder  
    - make "userSlice.js" in "user"  
-    > `import { createSlice } from '@reduxjs/toolkit';`    
-    > `const initialState = {`  
-    > &nbsp;&nbsp;`currentUser: null,`  
-    > &nbsp;&nbsp;`error: null,`  
-    > &nbsp;&nbsp;`loading: false,`  
-    > `};`  
-    > `export const userSlice = createSlice({`  
-    > `name: 'user',`  
-    > `initialState,`  
-    > `reducers: {`  
-    > `singnInStart: (state) => {state.loading = true;},`  
-    > `signInSuccess: (state, action) => {`  
-    > &nbsp;&nbsp;`state.currentUser = action.payload;`  
-    > &nbsp;&nbsp;`state.loading = false;`  
-    > &nbsp;&nbsp;`state.error = null;`  
-    > `},`  
-    > `signInFailure: (state, action) => {`  
-    > &nbsp;&nbsp;`state.error = action.payload;`  
-    > &nbsp;&nbsp;`state.loading = false;`  
-    > `},`  
-    > `},`  
-    > `});`  
-    > `export const { singnInStart, signInSuccess, signInFailure } = userSlice. actions;`  
-    > `export default userSlice.reducer;`  
+  ```javascript
+    import { createSlice } from '@reduxjs/toolkit';    
+    const initialState = {  
+      currentUser: null,  
+      error: null,  
+      loading: false,  
+    };  
+    export const userSlice = createSlice({  
+      name: 'user',  
+      initialState,  
+      reducers: {  
+        signInStart: (state) => {state.loading = true;},  
+        signInSuccess: (state, action) => {  
+          state.currentUser = action.payload;  
+          state.loading = false;  
+          state.error = null;  
+        },  
+        signInFailure: (state, action) => {  
+          state.error = action.payload; 
+          state.loading = false;  
+        },  
+      },  
+    });  
+    export const { signInStart, signInSuccess, signInFailure } = userSlice.actions; 
+    export default userSlice.reducer;
+  ```
 - modify store.js  
-  > ...  
-  > `import userReducer from './user/userSlice';`  
-  > ...  
-    `reducer: {user: userReducer,},`  
-  > ...  
-- apply dispatch to pages (signin.jsx)
-  > ...  
-  > `import { useDispatch, useSelector } from 'react-redux';`  
-  > `import {signInStart, signInSuccess, signInFailure,} from '../redux/user/userSlice';`  
-  > `export default function SignIn() {`  
-  > ...  
-  > // const [error, setError] = useState(null);  
-  > // const [loading, setLoading] = useState(false);  
-  > `const { error, loading } = useSelector((state) => state.user);`  
-  > ...  
-  > `const dispatch = useDispatch();`  
-  > ...  
-  > `const handleSubmit = async (e) => {`  
-  >  ...  
-  >  `try {`  
-  >    // setLoading(true);  
-  >    `dispatch(signInStart());`  
-  >    ...  
-  >    `if (data.success === false) {`  
-  >      // setLoading(false);  
-  >      // setError(data.message);  
-  >      `dispatch(signInFailure(data.message));`  
-  >      `return;`  
-  >    `}`  
-  >    // setLoading(false);  
-  >    // setError(null);  
-  >    `dispatch(signInSuccess(data));`  
-  >    ...  
-  >  `} catch (error) {`   
-  >    `// setLoading(false);`    
-  >    `// setError(error.message);`   
-  >    `dispatch(signInFailure(error.message));`  
-  >  `}`  
-  > `};`    
+```javascript
+  ...  
+  import userReducer from './user/userSlice';  
+    ...  
+    reducer: {user: userReducer,},  
+    ...  
+```
+- using reducer by applying dispatch to various pages (signin.jsx)
+```javascript
+  ...  
+  import { useDispatch, useSelector } from 'react-redux';  
+  import {signInStart, signInSuccess, signInFailure,} from '../redux/user/userSlice';  
+  export default function SignIn() {  
+    ...  
+    // const [error, setError] = useState(null);  
+    // const [loading, setLoading] = useState(false);  
+    const { error, loading } = useSelector((state) => state.user);  
+    ...  
+    const dispatch = useDispatch();  
+    ...  
+    const handleSubmit = async (e) => {  
+      ...  
+      try {  
+        // setLoading(true);  
+        dispatch(signInStart());  
+        ...  
+        if (data.success === false) {  
+          // setLoading(false);  
+          // setError(data.message);  
+          dispatch(signInFailure(data.message));  
+          return;  
+        }  
+        // setLoading(false);  
+        // setError(null);  
+        dispatch(signInSuccess(data));  
+        ...  
+      } catch (error) {   
+        // setLoading(false);   
+        // setError(error.message);   
+        dispatch(signInFailure(error.message));  
+      }  
+    };
+```   
 
 ### (35)  make Redux persist (retain data after page is refreshed)  
 - install redux-persist at B(client)  
