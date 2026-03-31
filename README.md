@@ -543,6 +543,155 @@
 ```
 <hr/>
 
+33. add google auth functionalty  
+- make project at google firebase 
+  - sign in and go to console
+  - add project(unable google analystics)...click continue
+  - add an app - web 
+- install firebase at client server 
+  > B> `npm i firebase`  
+- copy SDK file and create firebase.js in src folder  
+```javascript
+  import { initializeApp } from 'firebase/app';
+  const firebaseConfig = {
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: 'mean-blog-53182.firebaseapp.com',
+    projectId: 'mean-blog-53182',
+    storageBucket: 'mean-blog-53182.firebasestorage.app',
+    messagingSenderId: '1043609418056',
+    appId: '1:1043609418056:web:90e9c42ed3721804c89b7d',
+    measurementId: 'G-WEM9TNG9G2',
+  };
+  export const app = initializeApp(firebaseConfig);
+```
+- hide api_key by creating .env file at client folder
+  > `VITE_FIREBASE_API_KEY = "123"`
+- at google firebase, click "continue to the console"
+  - select authentication(security-authentication-login method)
+  - select google, click enable, change project name, input gmail and save
+- add OAuth component in SignIn.jsx, SignUp.jsx(the location after button)
+```javascript
+  ...
+  import OAuth from '../components/OAuth';
+    ...
+    </Button>
+    <OAuth />
+    </form>
+    ...
+```
+- create OAuth.js in component folder
+```javascript
+import { Button } from 'flowbite-react';
+import { AiFillGoogleCircle } from 'react-icons/ai';
+import { GoogleAuthProvider, signInWithPopup, getAuth } from 'firebase/auth';
+import { app } from '../firebase';
+import { useDispatch } from 'react-redux';
+import { signInSuccess } from '../redux/user/userSlice';
+import { useNavigate } from 'react-router-dom';
+
+export default function OAuth() {
+  const auth = getAuth(app);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleGoogleClick = async () => {
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({
+      prompt: 'select_account',
+    });
+    try {
+      const resultFromGoogle = await signInWithPopup(auth, provider);
+      const res = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: resultFromGoogle.user.displayName,
+          email: resultFromGoogle.user.email,
+          googlePhotoUrl: resultFromGoogle.user.photoURL,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        dispatch(signInSuccess(data));
+        navigate('/');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return (
+    <Button type="button" color="gray" outline onClick={handleGoogleClick}>
+      <AiFillGoogleCircle className="w-6 h-6 mr-2" />
+      Continue with Google
+    </Button>
+  );
+}
+```
+- At server, make route in auth.route.js
+```javascript
+import { google } from '../controllers/auth.controller.js';
+...
+router.post('/google', google);
+```
+- make controller in auth.controller.js
+```javascript
+export const google = async (req, res, next) => {
+  const { name, email, googlePhotoUrl } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+      const { password: pass, ...rest } = user._doc;
+      res
+        .cookie('access_token', token, {
+          httpOnly: true,
+          expire: new Date(Date.now() + 1000 * 60 * 60 * 24),
+        })
+        .status(200)
+        .json(rest);
+    } else {
+      const generatedPassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8);
+      const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
+      const newUser = new User({
+        username:
+          name.toLowerCase().split(' ').join('') +
+          Math.random().toString(9).slice(-4),
+        email,
+        password: hashedPassword,
+        profilePicture: googlePhotoUrl,
+      });
+      await newUser.save();
+      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+      const { password: pass, ...rest } = newUser._doc;
+      res
+        .status(200)
+        .cookie('access_token', token, {
+          httpOnly: true,
+          expire: new Date(Date.now() + 1000 * 60 * 60 * 24),
+        })
+        .json(rest);
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+```
+- add profilePicture model in user.model.js  
+```javascript
+  profilePicture: {
+    type: String,
+    default: 'http://??',
+  },
+```
+<hr/>
+
+
+
 ### (36)  make profile page private(only show profile page when signed in)  
 - modify Header.jsx (show image when signin, else "sign-in" message)  
   > ...  
