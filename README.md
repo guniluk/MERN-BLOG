@@ -506,35 +506,41 @@
     };
 ```   
 
-### (35)  make Redux persist (retain data after page is refreshed)  
+32.  make Redux persist (retain data after page is refreshed)  
 - install redux-persist at B(client)  
   > B> `npm i redux-persist`  
-- modify "store.js"  
-  > ...  
-  > `import { combineReducers, configureStore } from '@reduxjs/toolkit';`  
-  > `import { persistReducer, persistStore } from 'redux-persist';`  
-  > `import storage from 'redux-persist/lib/storage';`  
-  > `const rootReducer = combineReducers({user: userReducer,});`  
-  > `const persistConfig = {`  
-  > `key: 'root', storage, version: 1,};`  
-  > `const persistedReducer = persistReducer(persistConfig, rootReducer);`  
-  > `export const store = configureStore({`  
-  > ` reducer: persistedReducer,`  
-  > ...  
-  > `});`  
-  > ...  
-  > `export const persistor = persistStore(store);`  
+- modify "store.js" 
+```javascript 
+  ...  
+  import { combineReducers, configureStore } from '@reduxjs/toolkit';  
+  import { persistReducer, persistStore } from 'redux-persist';  
+  import storage from 'redux-persist/lib/storage';  
+  const rootReducer = combineReducers({user: userReducer,});  
+  const persistConfig = {  
+    key: 'root',
+    storage: storageEngine,
+    version: 1,};  
+  const persistedReducer = persistReducer(persistConfig, rootReducer);  
+  export const store = configureStore({  
+   reducer: persistedReducer,  
+   ...  
+  });  
+  ...  
+  export const persistor = persistStore(store);  
+```
 - modify "main.jsx"  
-  > ...  
-  > `import { persistor, store } from './redux/store.js';`  
-  > `import { PersistGate } from 'redux-persist/integration/react';`  
-  > `createRoot(document.getElementById('root')).render(`  
-  > `<Provider store={store}>`  
-  > ` <PersistGate loading={null} persistor={persistor}>`  
-  > `   <App />`  
-  > ` </PersistGate>`  
-  > `</Provider>,`  
-  > `);`  
+```javascript
+  ...  
+  import { persistor, store } from './redux/store.js';  
+  import { PersistGate } from 'redux-persist/integration/react';  
+  createRoot(document.getElementById('root')).render(  
+  <Provider store={store}>  
+    <PersistGate loading={null} persistor={persistor}>  
+      <App />  
+    </PersistGate>  
+  </Provider>,  
+  );  
+```
 <hr/>
 
 ### (36)  make profile page private(only show profile page when signed in)  
