@@ -726,36 +726,109 @@ export const google = async (req, res, next) => {
 ```
 <hr/>
 
-35. 
+35. complete dark mode functionality(client B)
+- create theme folder at redux folder, and create themeSlice.js  
+```javascript
+  import { createSlice } from '@reduxjs/toolkit';
+  const initialState = {
+    theme: 'light',};
+  export const themeSlice = createSlice({
+    name: 'theme',
+    initialState,
+    reducers: {
+      toggleTheme: (state) => {
+        state.theme = state.theme === 'light' ? 'dark' : 'light';},
+    },
+  });
+  export const { toggleTheme } = themeSlice.actions;
+  export default themeSlice.reducer;
+```
+- modify store.js  
+```javascript
+  import themeReducer from './theme/themeSlice';
+  ...
+  const rootReducer = combineReducers({ user: userReducer, theme: themeReducer });
 
-### (36)  make profile page private(only show profile page when signed in)  
-- modify Header.jsx (show image when signin, else "sign-in" message)  
-  > ...  
-  > `import { useSelector } from 'react-redux';`  
-  > `export default function Header() {`  
-  > `const { currentUser } = useSelector((state) => state.user);`  
-  > `return (`  
-  > `...`  
-  > `<Link to="/profile">`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`{currentUser ? (<img src="byh.jpg"/>) : (<li>Sign In</li>)}`  
-  > `</Link>`  
-  > ...  
+```
+- create ThemeProvider.jsx for chaging all children in components folder  
+```javascript
+  import { useSelector } from 'react-redux';
+  export default function ThemeProvider({ children }) {
+    const { theme } = useSelector((state) => state.theme);
+    return (
+      <div className={theme}>
+        <div className="bg-white text-gray-700 dark:text-gray-200 dark:bg-[rgb(16,23,42)] min-h-screen">
+          {children}
+        </div>
+      </div>
+    );
+  }
+```
+- modify main.jsx for applying ThemeProvider  
+```javascript
+  ...
+  import ThemeProvider from './components/ThemeProvider.jsx';
+  ...
+    <PersistGate loading={null} persistor={persistor}>
+      <Provider store={store}>
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
+      </Provider>
+    </PersistGate>
+```
+- modify Header.jsx  
+```javascript
+  import { FaMoon, FaSun } from 'react-icons/fa';
+  import { useSelector, useDispatch } from 'react-redux';
+  import { toggleTheme } from '../redux/theme/themeSlice';
+  ...
+  export default function Header() {
+    ...
+    const { theme } = useSelector((state) => state.theme);
+    const dispatch = useDispatch();
+
+    ...
+      <Button
+      className="w-14 h-11 hidden sm:inline"
+      color="gray"
+      pill
+      onClick={() => dispatch(toggleTheme())}
+      >
+        {theme === 'light' ? <FaMoon /> : <FaSun />}
+      </Button>
+    ...
+  }
+```
+- if not toggle light and dark mode, add nect code to index.css
+```css
+  @variant dark (&:where(.dark, .dark *));
+  @layer base {
+    body {@apply transition-colors duration-300;}
+  } 
+```
+
+
+
+36.   make profile page private(only show profile page when signed in)  
 - create PrivateRoute.jsx  
-  >`import { useSelector } from 'react-redux';`  
-  >`import { Outlet, Navigate } from 'react-router-dom';`  
-  >`export default function PrivateRoute() {`  
-  >`const { currentUser } = useSelector((state) => state.user);`  
-  >`return currentUser ? <Outlet /> : <Navigate to="/sign-in" />;}`  
+```javascript
+  import { useSelector } from 'react-redux';  
+  import { Outlet, Navigate } from 'react-router-dom';  
+  export default function PrivateRoute() {  
+    const { currentUser } = useSelector((state) => state.user);  
+    return currentUser ? <Outlet /> : <Navigate to="/sign-in" />;}  
+```
 - modify App.jsx()  
-  > ...  
-  > `import PrivateRoute from './components/PrivateRoute';`
-  > `export default function App() {`  
-  > `return (`  
-  > ...  
-  > `<Route element={<PrivateRoute />}>`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`<Route path="/profile" element={<Profile />} />`  
-  > `</Route>`  
-  > ...  
+```javascript
+  ...  
+  import PrivateRoute from './components/PrivateRoute';
+  export default function App() {  
+    return (  
+      ...  
+     <Route element={<PrivateRoute />}>  
+        <Route path="/profile" element={<Profile />} />  
+      </Route>    
 <hr/>
 
 ### (37)  update user profile at server(C)  
