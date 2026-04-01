@@ -690,7 +690,43 @@ export const google = async (req, res, next) => {
 ```
 <hr/>
 
+34. update header component with user data
+- modify Header.jsx  
+```javascript
+  import { useSelector } from 'react-redux';  
+  ...
+  export default function Header() {  
+    ...
+    const { currentUser } = useSelector((state) => state.user);
+    return (
+      ...
+      {currentUser ? (
+        <Dropdown arrowIcon={false} inline
+          label={<Avatar  img={currentUser.profilePicture} rounded />}>
+          <DropdownHeader>
+            <span>@{currentUser.username}</span>
+            <span>{currentUser.email}</span>
+          </DropdownHeader>
+          <Link to="/dashboard?tab=profile">
+            <DropdownItem>Profile</DropdownItem>
+          </Link>
+          <DropdownDivider />
+          <Link to="/sign-in">
+            <DropdownItem>Sign Out</DropdownItem>
+          </Link>
+        </Dropdown>
+      ) : (
+        <Link to="/sign-in">
+          <Button>
+            Sign In
+          </Button>
+        </Link>
+      )}
+    )
+```
+<hr/>
 
+35. 
 
 ### (36)  make profile page private(only show profile page when signed in)  
 - modify Header.jsx (show image when signin, else "sign-in" message)  
