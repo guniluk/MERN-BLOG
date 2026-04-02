@@ -807,11 +807,10 @@ export const google = async (req, res, next) => {
     body {@apply transition-colors duration-300;}
   } 
 ```
+<hr/>
 
-
-
-36.   make profile page private(only show profile page when signed in)  
-- create PrivateRoute.jsx  
+36. make dashboard private(only show when signed in)  
+- create PrivateRoute.jsx in components folder(client) 
 ```javascript
   import { useSelector } from 'react-redux';  
   import { Outlet, Navigate } from 'react-router-dom';  
@@ -828,8 +827,11 @@ export const google = async (req, res, next) => {
       ...  
      <Route element={<PrivateRoute />}>  
         <Route path="/profile" element={<Profile />} />  
-      </Route>    
+      </Route>  
+```  
 <hr/>
+
+
 
 ### (37)  update user profile at server(C)  
 - enable parsing cookie in index.js  
