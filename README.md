@@ -897,6 +897,137 @@ export default function DashSidebar() {
 ```
 <hr/>
 
+38. complete DashProfile.jsx at client(B)  
+```javascript
+  import { useSelector } from 'react-redux';
+  import { Button, TextInput } from 'flowbite-react';
+  export default function DashProfile() {
+    const { currentUser } = useSelector((state) => state.user);
+    return (
+      <div className="max-w-lg mx-auto p-5 w-full">
+        <h1 className="text-slate-400 text-xl font-bold mb-7 my-7 text-center">
+          Profile
+        </h1>
+        <form className="flex flex-col gap-7">
+          <div className="w-32 h-32 self-center cursor-pointer shadow-md overflow-hidden rounded-full">
+            <img
+              src={currentUser.profilePicture}
+              alt="user"
+              className="rounded-full w-full h-full border-8 border-[lightgray] object-cover"
+            />
+          </div>
+          <TextInput
+            id="username"
+            type="text"
+            placeholder="username"
+            defaultValue={currentUser.username}
+          />
+          <TextInput
+            id="email"
+            type="email"
+            placeholder="e-mail"
+            defaultValue={currentUser.email}
+          />
+          <TextInput id="password" type="password" placeholder="password" />
+          <Button type="submit" color="green" outline>
+            Update
+          </Button>
+        </form>
+        <div className="text-red-500 flex justify-between mt-5">
+          <span className="cursor-pointer">Delete Account</span>
+          <span className="cursor-pointer">Sign Out</span>
+        </div>
+      </div>
+    );
+  }
+```
+<hr/>
+
+
+
+
+
+
+
+
+
+39.   update user profile at client(B)  
+- create update user reducer in userSlice.js  
+```javascript
+export const userSlice = createSlice({  
+...  
+reducers: {  
+  ...  
+  updateUserStart: (state) => {  
+    state.loading = true;},  
+  updateUserSuccess: (state, action) => {  
+    state.currentUser = action.payload;  
+    state.loading = false;  
+    state.error = null;},  
+  updateUserFailure: (state, action) => {  
+    state.error = action.payload;  
+    state.loading = false;},  
+... 
+``` 
+- add change, submit handler in profile.jsx  
+```javascript
+  ...  
+  import {updateUserStart, updateUserSuccess, updateUserFailure,} from '../redux/user/userSlice';  
+  import { useDispatch } from 'react-redux';  
+  ...  
+  export default function Profile() {  
+    const { currentUser, loading, error } = useSelector((state) => state.user);  
+    const dispatch = useDispatch();  
+    const [formData, setFormData] = useState({});  
+    const [updateSuccess, setUpdateSuccess] = useState(false);  
+    const handleChange = (e) => {  
+      setFormData({ ...formData, [e.target.id]: e.target.value });};  
+    const handleSubmit = async (e) => { 
+      e.preventDefault();  
+      try {  
+        dispatch(updateUserStart());  
+        const res = await fetch('/api/users/update/${currentUser._id}', {  
+        method: 'POST', headers: {'Content-Type': 'application/json',},  
+        body: JSON.stringify(formData),});  
+        const data = await res.json();  
+        if (data.success === false) {  
+          dispatch(updateUserFailure(data.message));  
+          return;}  
+        dispatch(updateUserSuccess(data));  
+        setUpdateSuccess(true);  
+        setFormData({});  
+      } catch (error) {  
+      dispatch(updateUserFailure(error.message));}  
+    };  
+    return (  
+      <div>  
+      <form onSubmit={handleSubmit}>  
+      ...  
+      <input  
+      type="text"  
+      id="username"  
+      placeholder="Username"  
+      defaultValue={currentUser.username}  
+      onChange={handleChange}/>  
+      ...  
+      <button  
+      disabled={loading}  
+      ...  
+      {loading ? 'Loading' : 'User update'} 
+      </button>  
+      </form>  
+      ...  
+```
+- using insomnia, change and update profile, check Mongo DB
+<hr/>
+
+
+
+
+
+
+
+
 ### (37)  update user profile at server(C)  
 - enable parsing cookie in index.js  
 ```javascript
@@ -946,71 +1077,8 @@ export default function DashSidebar() {
 - using insomnia, test update user
   > POST : localhost:3000/api/users/update/user_id
 
-### (38)  update user profile at client(B)  
-- create update user reducer in userSlice.js  
-  > `export const userSlice = createSlice({`  
-  > ...  
-  > `reducers: {`  
-  > ...  
-  > `updateUserStart: (state) => {`  
-  > &nbsp;&nbsp;`state.loading = true;},`  
-  > `updateUserSuccess: (state, action) => {`  
-  > &nbsp;&nbsp;`state.currentUser = action.payload;`  
-  > &nbsp;&nbsp;`state.loading = false;`  
-  > &nbsp;&nbsp;`state.error = null;},`  
-  > `updateUserFailure: (state, action) => {`  
-  > &nbsp;&nbsp;`state.error = action.payload;`  
-  > &nbsp;&nbsp;`state.loading = false;},`  
-  > ...  
-- add change, submit handler in profile.jsx  
-  > ...  
-  > `import {updateUserStart, updateUserSuccess, updateUserFailure,} from '../redux/user/userSlice';`  
-  > `import { useDispatch } from 'react-redux';`  
-  > ...  
-  > `export default function Profile() {`  
-  > `const { currentUser, loading, error } = useSelector((state) => state.user);`  
-  > `const dispatch = useDispatch();`  
-  > `const [formData, setFormData] = useState({});`  
-  > `const [updateSuccess, setUpdateSuccess] = useState(false);`  
-  > `const handleChange = (e) => {`  
-  > &nbsp;&nbsp;`setFormData({ ...formData, [e.target.id]: e.target.value });};`  
-  > `const handleSubmit = async (e) => {`  
-  > &nbsp;&nbsp;`e.preventDefault();`  
-  > &nbsp;&nbsp;`try {`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`dispatch(updateUserStart());`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`const res = await fetch('/api/users/update/${currentUser._id}', {`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`method: 'POST', headers: {'Content-Type': 'application/json',},`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`body: JSON.stringify(formData),});`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`const data = await res.json();`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`if (data.success === false) {`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`dispatch(updateUserFailure(data.message));`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`return;}`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`dispatch(updateUserSuccess(data));`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`setUpdateSuccess(true);`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`setFormData({});`  
-  > &nbsp;&nbsp;`} catch (error) {`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`dispatch(updateUserFailure(error.message));}`  
-  > `};`  
-  > `return (`  
-    &nbsp;&nbsp;`<div>`  
-    &nbsp;&nbsp;`<form onSubmit={handleSubmit}>`  
-  > &nbsp;&nbsp;...  
-  > &nbsp;&nbsp;`<input`  
-    &nbsp;&nbsp;&nbsp;&nbsp;`type="text"`  
-    &nbsp;&nbsp;&nbsp;&nbsp;`id="username"`  
-    &nbsp;&nbsp;&nbsp;&nbsp;`placeholder="Username"`  
-    &nbsp;&nbsp;&nbsp;&nbsp;`defaultValue={currentUser.username}`  
-    &nbsp;&nbsp;&nbsp;&nbsp;`onChange={handleChange}/>`  
-  >&nbsp;&nbsp;...  
-  > &nbsp;&nbsp;`<button`  
-    &nbsp;&nbsp;&nbsp;&nbsp;`disabled={loading}`  
-  >  &nbsp;&nbsp;&nbsp;&nbsp;...  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`{loading ? 'Loading' : 'User update'}`  
-  > &nbsp;&nbsp;`</button>`  
-  > &nbsp;&nbsp;`</form>`  
-  > &nbsp;&nbsp;...  
-- using insomnia, change and update profile, check Mongo DB
-<hr/>
+
+
 
 ### (39)  delete user profile at server(C)  
 - create delete router in user.route.js  
