@@ -831,30 +831,96 @@ export const google = async (req, res, next) => {
 ```  
 <hr/>
 
-
+37. complete sidebar of dashboard at client(B)
+- modify Dashboard.jsx  
+```javascript
+import { useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import DashSidebar from '../components/DashSidebar';
+import DashProfile from '../components/DashProfile';
+export default function Dashboard() {
+  const location = useLocation();
+  const [tab, setTab] = useState('');
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const tabFromUrl = urlParams.get('tab');
+    if (tabFromUrl) {
+      setTab(tabFromUrl);
+    }
+  }, [location.search]);
+  return (
+    <div className="min-h-screen flex flex-col md:flex-row ">
+      <div className="md:w-56">
+        <DashSidebar />
+      </div>
+      {tab === 'profile' && <DashProfile />}
+    </div>
+  );
+}
+```
+- make DashSidebar.jsx in components folder  
+```javascript
+import {Sidebar,SidebarItem,SidebarItemGroup,SidebarItems,} from 'flowbite-react';
+import { HiArrowSmRight, HiUser } from 'react-icons/hi';
+import { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+export default function DashSidebar() {
+  const location = useLocation();
+  const [tab, setTab] = useState('');
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const tabFromUrl = urlParams.get('tab');
+    if (tabFromUrl) {setTab(tabFromUrl);}
+  }, [location.search]);
+  return (
+    <Sidebar className="w-full md:w-56">
+      <SidebarItems>
+        <SidebarItemGroup>
+          <SidebarItem
+            as={Link}
+            to="/dashboard?tab=profile"
+            active={tab === 'profile'}
+            icon={HiUser}
+            label="user"
+            labelColor="dark"
+          >
+            Profile
+          </SidebarItem>
+          <SidebarItem icon={HiArrowSmRight} className="cursor-pointer">
+            Sign Out
+          </SidebarItem>
+        </SidebarItemGroup>
+      </SidebarItems>
+    </Sidebar>
+  );
+}
+```
+<hr/>
 
 ### (37)  update user profile at server(C)  
 - enable parsing cookie in index.js  
-  > ...  
-  > `import cookieParser from 'cookie-parser';`  
-  > ...  
-  > `app.use(cookieParser());`  
+```javascript
+  ...  
+  import cookieParser from 'cookie-parser';  
+  ...  
+  app.use(cookieParser());  
 - check if authenticated or not(create middleware verifyUser.js in utils folder)  
-  > `import { errorHandler } from './error.js';`  
-  > `import jwt from 'jsonwebtoken';`  
-  > `export const verifyToken = (req, res, next) => {`  
-  > `const token = req.cookies.access_token;`  
-  > `if (!token) return next(errorHandler(401, 'Unauthenticated!'));`  
-  > `jwt.verify(token, process.env.JWT_SECRET, (err, user) => {`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`if (err) return next(errorHandler(403, 'Token is not valid!'));`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`req.user = user;`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`next();`
-  > `}); };`
+  import { errorHandler } from './error.js';  
+  import jwt from 'jsonwebtoken';  
+  export const verifyToken = (req, res, next) => {  
+  const token = req.cookies.access_token;  
+  if (!token) return next(errorHandler(401, 'Unauthenticated!'));  
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {  
+  if (err) return next(errorHandler(403, 'Token is not valid!'));  
+  req.user = user;  
+  next();
+  }); };
 - create verified user update router in user.route.js  
-  > `import { updateUser } from '../controllers/user.controller.js';`  
-  > `import { verifyToken } from '../utils/verifyUser.js';`  
-  > ...  
-  > `router.post('/update/:id', verifyToken, updateUser);`  
+  import { updateUser } from '../controllers/user.controller.js';  
+  import { verifyToken } from '../utils/verifyUser.js';  
+  ...  
+  router.post('/update/:id', verifyToken, updateUser);  
+```
 - update user DB in user.controller.js  
   > `import bcryptjs from 'bcryptjs';`  
   > `import User from '../models/user.model.js';`  
