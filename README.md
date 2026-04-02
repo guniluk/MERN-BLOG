@@ -943,6 +943,58 @@ export default function DashSidebar() {
 ```
 <hr/>
 
+39. image upload in DashProfile.jsx at client(B)  
+- modify DashProfile.jsx  
+```javascript
+  ...
+  import { useState, useRef, useEffect } from 'react';
+  ...
+  const [imageFile, setImageFile] = useState(null);
+  const [imageFileUrl, setImageFileUrl] = useState(null);
+  const filePickerRef = useRef();
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImageFileUrl(URL.createObjectURL(file));
+    } else {
+      setImageFile(null);
+      setImageFileUrl(null);
+    }
+  };
+  const uploadImage = async () => {
+    // on firebase, Spark plan cannot make file storage
+    // so, image cannot be stored in cloud
+  };
+  useEffect(() => {
+    if (imageFile) {uploadImage();}}, [imageFile]);
+  return (
+    ...
+    <form className="flex flex-col gap-7">
+    <input
+      type="file"
+      accept="image/*"
+      onChange={handleImageChange}
+      ref={filePickerRef}
+      hidden/>
+    <div
+      className="w-32 h-32 self-center cursor-pointer shadow-md overflow-hidden rounded-full"
+      onClick={() => {
+        filePickerRef.current.click();
+      }}
+    >
+      <img
+        src={imageFileUrl || currentUser.profilePicture}
+        alt="user"
+        className="rounded-full w-full h-full border-8 border-[lightgray] object-cover"
+      />
+    </div>
+    ...
+    </form>
+    ...
+  )
+```
+<hr/>
 
 
 
@@ -951,7 +1003,7 @@ export default function DashSidebar() {
 
 
 
-39.   update user profile at client(B)  
+40.   update user profile at client(B)  
 - create update user reducer in userSlice.js  
 ```javascript
 export const userSlice = createSlice({  
