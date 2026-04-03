@@ -1053,88 +1053,97 @@ export default function DashSidebar() {
 ```  
 - using insomnia, test update user
   > POST : localhost:3000/api/users/update/user_id
+<hr/>
 
-
-
-
-1.    update user profile at client(B)  
+41. complete update user profile page at client(B)  
 - create update user reducer in userSlice.js  
 ```javascript
 export const userSlice = createSlice({  
-...  
-reducers: {  
   ...  
-  updateUserStart: (state) => {  
-    state.loading = true;},  
-  updateUserSuccess: (state, action) => {  
-    state.currentUser = action.payload;  
-    state.loading = false;  
-    state.error = null;},  
-  updateUserFailure: (state, action) => {  
-    state.error = action.payload;  
-    state.loading = false;},  
-... 
+  reducers: {  
+    ...  
+    updateUserStart: (state) => {  
+      state.loading = true;},  
+    updateUserSuccess: (state, action) => {  
+      state.currentUser = action.payload;  
+      state.loading = false;  
+      state.error = null;},  
+    updateUserFailure: (state, action) => {  
+      state.error = action.payload;  
+      state.loading = false;},  
+  }
+} 
 ``` 
-- add change, submit handler in profile.jsx  
+- add change, submit handler in DashProfile.jsx  
 ```javascript
   ...  
   import {updateUserStart, updateUserSuccess, updateUserFailure,} from '../redux/user/userSlice';  
   import { useDispatch } from 'react-redux';  
   ...  
-  export default function Profile() {  
+  export default function DashProfile() {  
     const { currentUser, loading, error } = useSelector((state) => state.user);  
     const dispatch = useDispatch();  
     const [formData, setFormData] = useState({});  
     const [updateSuccess, setUpdateSuccess] = useState(false);  
-    const handleChange = (e) => {  
-      setFormData({ ...formData, [e.target.id]: e.target.value });};  
-    const handleSubmit = async (e) => { 
-      e.preventDefault();  
-      try {  
-        dispatch(updateUserStart());  
-        const res = await fetch('/api/users/update/${currentUser._id}', {  
-        method: 'POST', headers: {'Content-Type': 'application/json',},  
-        body: JSON.stringify(formData),});  
-        const data = await res.json();  
-        if (data.success === false) {  
-          dispatch(updateUserFailure(data.message));  
-          return;}  
-        dispatch(updateUserSuccess(data));  
-        setUpdateSuccess(true);  
-        setFormData({});  
-      } catch (error) {  
-      dispatch(updateUserFailure(error.message));}  
-    };  
+    const [updateError, setUpdateError] = useState(null);
+    ...
+    const handleChange = (e) => {
+      setFormData((prev) => ({...prev,[e.target.id]: e.target.value,}));
+    };
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      setUpdateError(null);
+      setUpdateSuccess(null);
+      if (Object.keys(formData).length === 0) {
+        setUpdateError('No change detected!');
+        return;}
+      try {
+        dispatch(updateUserStart());
+        const res = await fetch(`/api/user/update/${currentUser._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',},
+          body: JSON.stringify(formData),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          dispatch(updateUserFailure(data.message));
+          setUpdateError(data.message);
+        } else {
+          dispatch(updateUserSuccess(data));
+          setUpdateSuccess('User profile updated successfully!');
+        }
+      } catch (error) {
+        dispatch(updateUserFailure(error.message));
+        setUpdateError(error.message);
+      }
+    };
     return (  
       <div>  
-      <form onSubmit={handleSubmit}>  
-      ...  
-      <input  
-      type="text"  
-      id="username"  
-      placeholder="Username"  
-      defaultValue={currentUser.username}  
-      onChange={handleChange}/>  
-      ...  
-      <button  
-      disabled={loading}  
-      ...  
-      {loading ? 'Loading' : 'User update'} 
-      </button>  
-      </form>  
-      ...  
+        <form onSubmit={handleSubmit}>  
+          ...  
+          <input  
+          type="text"  
+          id="username"  
+          placeholder="Username"  
+          defaultValue={currentUser.username}  
+          onChange={handleChange}/>  
+          ...  
+          <button  
+            disabled={loading}  
+            ...>  
+            {loading ? 'Loading' : 'User update'} 
+          </button>  
+        </form>  
+        {updateSuccess && (<Alert color="green" className="mt-5">{updateSuccess}</Alert>)}
+        {updateError && (<Alert color="red" className="mt-5">{updateError}</Alert>)}
+      </div>  
+    );  
+  }  
 ```
-- using insomnia, change and update profile, check Mongo DB
+- change and update profile, check Mongo DB
 <hr/>
-
-
-
-
-
-
-
-
-
 
 
 
