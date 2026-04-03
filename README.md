@@ -1145,25 +1145,27 @@ export const userSlice = createSlice({
 - change and update profile, check Mongo DB
 <hr/>
 
-
-
-
-### (39)  delete user profile at server(C)  
-- create delete router in user.route.js  
-  > `import {deleteUser} from '../controllers/user.controller.js';`  
-  > ...  
-  > `router.delete('/delete/:id', verifyToken, deleteUser);`  
+42. add delete user profile at server(C)  
+- create delete router in user.route.js 
+```javascript 
+  import {deleteUser} from '../controllers/user.controller.js';  
+  ...  
+  router.delete('/delete/:id', verifyToken, deleteUser);
+```  
 - delete user DB in user.controller.js  
-  > ...  
-  > `export const deleteUser = async (req, res, next) => {`  
-  > `if (req.user.id !== req.params.id) {`  
-  > &nbsp;&nbsp;`return next(errorHandler(401, 'You can delete only your account!')); }`  
-  > `try {`  
-  > &nbsp;&nbsp;`await User.findByIdAndDelete(req.params.id);`  
-  > &nbsp;&nbsp;`res.clearCookie('access_token');`  
-  > &nbsp;&nbsp;`res.status(200).json({ message: 'User deleted successfully!' });`  
-  > `} catch (error) {`  
-  > `next(error); } };`  
+```javascript
+  ...  
+  export const deleteUser = async (req, res, next) => {  
+    if (req.user.id !== req.params.userId) {  
+      return next(errorHandler(401, 'You can delete only your account!')); }  
+    try {  
+      await User.findByIdAndDelete(req.params.userId);  
+      res.clearCookie('access_token');  
+      res.status(200).json({ message: 'User deleted successfully!' });  
+  } catch (error) {  
+    next(error); } };
+```  
+<hr/>
 
 ### (40)  delete user profile at client(B)  
 - create delete user reducer in userSlice.js  
