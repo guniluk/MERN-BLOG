@@ -996,14 +996,68 @@ export default function DashSidebar() {
 ```
 <hr/>
 
+40.  update user profile API at server(C)  
+- check if authenticated or not(create middleware verifyUser.js in utils folder)  
+```javascript
+  import { errorHandler } from './error.js';  
+  import jwt from 'jsonwebtoken';  
+  export const verifyToken = (req, res, next) => {  
+    const token = req.cookies.access_token;  
+    if (!token) return next(errorHandler(401, 'Unauthenticated!'));  
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {  
+      if (err) return next(errorHandler(403, 'Token is not valid!'));  
+      req.user = user;  //{ id: validUser._id } from auth.controller.js
+      next();
+    }); };
+```
+- enable parsing cookie in index.js  
+  - install cookie-parser at A folder
+    A> `npm i cookie-parser`  
+  -  initialize cookie-parser in index.js  
+  ```javascript
+    ...  
+    import cookieParser from 'cookie-parser';  
+    ...  
+    app.use(cookieParser()); 
+  ``` 
+- create verified user update router in user.route.js  
+```javascript
+  import { updateUser } from '../controllers/user.controller.js';  
+  import { verifyToken } from '../utils/verifyUser.js';  
+  ...  
+  router.post('/update/:userId', verifyToken, updateUser);  
+```
+- update user DB in user.controller.js  
+```javascript
+  import bcryptjs from 'bcryptjs';  
+  import User from '../models/user.model.js';  
+  import { errorHandler } from '../utils/error.js';  
+  export const updateUser = async (req, res, next) => {  
+    if (req.user.id !== req.params.userId) {  
+    return next(errorHandler(401, 'You can update only your account!'));}  
+    try {  
+      if (req.body.password) {  
+        req.body.password = bcryptjs.hashSync(req.body.password, 10);}  
+        const updatedUser = await User.findByIdAndUpdate(  
+          req.params.id,  
+          {  
+            $set: {  
+              username: req.body.username,  
+              email: req.body.email, 
+              password: req.body.password, },},  
+          { new: true },);  
+        const { password, ...rest } = updatedUser._doc;  
+        res.status(200).json(rest);  
+   } catch (error) {next(error);}  
+};
+```  
+- using insomnia, test update user
+  > POST : localhost:3000/api/users/update/user_id
 
 
 
 
-
-
-
-40.   update user profile at client(B)  
+1.    update user profile at client(B)  
 - create update user reducer in userSlice.js  
 ```javascript
 export const userSlice = createSlice({  
@@ -1080,54 +1134,7 @@ reducers: {
 
 
 
-### (37)  update user profile at server(C)  
-- enable parsing cookie in index.js  
-```javascript
-  ...  
-  import cookieParser from 'cookie-parser';  
-  ...  
-  app.use(cookieParser());  
-- check if authenticated or not(create middleware verifyUser.js in utils folder)  
-  import { errorHandler } from './error.js';  
-  import jwt from 'jsonwebtoken';  
-  export const verifyToken = (req, res, next) => {  
-  const token = req.cookies.access_token;  
-  if (!token) return next(errorHandler(401, 'Unauthenticated!'));  
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {  
-  if (err) return next(errorHandler(403, 'Token is not valid!'));  
-  req.user = user;  
-  next();
-  }); };
-- create verified user update router in user.route.js  
-  import { updateUser } from '../controllers/user.controller.js';  
-  import { verifyToken } from '../utils/verifyUser.js';  
-  ...  
-  router.post('/update/:id', verifyToken, updateUser);  
-```
-- update user DB in user.controller.js  
-  > `import bcryptjs from 'bcryptjs';`  
-  > `import User from '../models/user.model.js';`  
-  > `import { errorHandler } from '../utils/error.js';`  
-  > `export const updateUser = async (req, res, next) => {`  
-  > `if (req.user.id !== req.params.id) {`  
-  > &nbsp;&nbsp;`return next(errorHandler(401, 'You can update only your account!'));}`  
-  > `try {`  
-  > &nbsp;&nbsp;`if (req.body.password) {`  
-  > &nbsp;&nbsp;`req.body.password = bcryptjs.hashSync(req.body.password, 10);}`  
-  > `const updatedUser = await User.findByIdAndUpdate(`  
-  > &nbsp;&nbsp;`req.params.id,`  
-  > &nbsp;&nbsp;`{`  
-  > &nbsp;&nbsp;`$set: {`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`username: req.body.username,`  
-  >&nbsp;&nbsp;&nbsp;&nbsp; `email: req.body.email,`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`password: req.body.password, },},`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`{ new: true },);`  
-  > `const { password, ...rest } = updatedUser._doc;`  
-  > `res.status(200).json(rest);`  
-  > `} catch (error) {next(error);}`  
-  > `};`  
-- using insomnia, test update user
-  > POST : localhost:3000/api/users/update/user_id
+
 
 
 
