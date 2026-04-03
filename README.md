@@ -1167,42 +1167,88 @@ export const userSlice = createSlice({
 ```  
 <hr/>
 
-### (40)  delete user profile at client(B)  
+43. complete delete user profile at client(B)  
 - create delete user reducer in userSlice.js  
-  > ...  
-  > `export const userSlice = createSlice({`  
-  > `name: 'user', initialState,`  
-  > `reducers: {`  
-  > ...  
-  > `deleteUserStart: (state) => {`  
-  > &nbsp;&nbsp;`state.loading = true;},`  
-  > `deleteUserSuccess: (state) => {`  
-  > &nbsp;&nbsp;`state.currentUser = null;`  
-  > &nbsp;&nbsp;`state.loading = false;`  
-  > &nbsp;&nbsp;`state.error = null;},`  
-  > `deleteUserFailure: (state, action) => {`  
-  > &nbsp;&nbsp;`state.error = action.payload;`  
-  > &nbsp;&nbsp;`state.loading = false;},`  
-  > ...
-- add delete handler in profile.jsx  
-  > ...  
-  > `import {deleteUserStart, deleteUserSuccess, deleteUserFailure,} from '../redux/user/userSlice';`  
-  > `export default function Profile() {`  
-  > ...
-  > `const handleDelete = async () => {`  
-  > &nbsp;&nbsp;`try {`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`dispatch(deleteUserStart());`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`const res = await fetch('/api/users/delete/${currentUser._id}', {method: 'DELETE',});`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`const data = await res.json();`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`if (data.success === false) {`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`dispatch(deleteUserFailure(data.message));`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`return;}`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`dispatch(deleteUserSuccess(data));`  
-  > &nbsp;&nbsp;`} catch (error) {`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`dispatch(deleteUserFailure(error.message));}`  
-  > &nbsp;&nbsp;`};`  
-  > ...
+```javascript
+  ...  
+  export const userSlice = createSlice({  
+    name: 'user', initialState,  
+    reducers: {  
+      ...  
+      deleteUserStart: (state) => { state.loading = true;},  
+      deleteUserSuccess: (state) => {  
+        state.currentUser = null;  
+        state.loading = false;  
+        state.error = null;}, 
+      deleteUserFailure: (state, action) => {  
+        state.error = action.payload;  
+       state.loading = false;}
+    }
+  })  
+```
+- add delete handler in DashProfile.jsx  
+```javascript
+  ...  
+  import {deleteUserStart, deleteUserSuccess, deleteUserFailure,} from '../redux/user/userSlice';  
+  export default function DashProfile() {  
+    ...
+    const { currentUser, error } = useSelector((state) => state.user);
+    const [showModal, setShowModal] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    ...
+    const handleDelete = async () => {
+      setShowModal(false);
+      try {
+        dispatch(deleteUserStart());
+        const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+          method: 'DELETE',});
+        const data = await res.json();
+        if (!res.ok) {
+          dispatch(deleteUserFailure(data.message));
+          return;
+        }
+        dispatch(deleteUserSuccess(data));
+      } catch (error) {
+        dispatch(deleteUserFailure(error.message));
+      }
+    };
+    return (
+    <div>
+      ...
+      <span className="cursor-pointer" onClick={() => setShowModal(true)}>
+          Delete Account
+      </span>
+      ...
+      {error && (<Alert color="red" className="mt-5">{error}</Alert>)}
+      ...
+      <Modal
+        show={showModal}
+        size="md"
+        onClose={() => setShowModal(false)}
+        popup
+      >
+        <ModalHeader>Delete Account</ModalHeader>
+        <ModalBody>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="w-17 h-17 text-gray-400 dark:text-gray-200 mb-5 mx-auto" />
+            <h3 className="mb-5 text-gray-500 dark:text-gray-200 text-lg">
+              Are you sure you want to delete your account? This action cannotbe undone^^
+            </h3>
+          </div>
+        </ModalBody>
+        <ModalFooter className="mx-auto">
+          <Button onClick={() => setShowModal(false)}>Cancel</Button>
+          <Button color="red" onClick={handleDelete}>Delete</Button>
+        </ModalFooter>
+      </Modal>
+    </div>
+    );}
+  }
+```
 <hr/>
+
+
+
 
 ### (41) signout at server(C)  
 - add signout router in auth.route.js  
