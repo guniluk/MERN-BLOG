@@ -7,3 +7,10 @@
     @apply transition-colors duration-300;
   }
 }
+
+body {
+  height: 100vh;
+}
+.ql-editor {
+  font-size: 1.1rem;
+}

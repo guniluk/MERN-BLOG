@@ -9,6 +9,7 @@ import {
   ModalFooter,
 } from 'flowbite-react';
 import { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   updateUserStart,
   updateUserSuccess,
@@ -24,7 +25,7 @@ import { useDispatch } from 'react-redux';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
 export default function DashProfile() {
-  const { currentUser, error } = useSelector((state) => state.user);
+  const { currentUser, error, loading } = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [formData, setFormData] = useState({});
@@ -185,9 +186,16 @@ export default function DashProfile() {
           placeholder="password"
           onChange={handleChange}
         />
-        <Button type="submit" color="green" outline>
-          Update
+        <Button type="submit" color="green" outline disabled={loading}>
+          {loading ? 'Updating...' : 'Update'}
         </Button>
+        {currentUser.isAdmin && (
+          <Link to={'/create-post'}>
+            <Button type="button" color="blue" outline className="w-full">
+              Create Post
+            </Button>
+          </Link>
+        )}
       </form>
       <div className="text-red-500 flex justify-between mt-5">
         <span className="cursor-pointer" onClick={() => setShowModal(true)}>
