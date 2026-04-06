@@ -1358,6 +1358,33 @@ export default function DashSidebar() {
 ```
 <hr/>
 
+46. add admin functionality to the user at server(C)  
+- modify user.model.js  
+```javascript
+  isAdmin: {
+    type: Boolean,
+    default: false,
+  },
+```
+- modify auth.controller.js  
+```javascript
+  ...
+  const token = jwt.sign(
+    { id: validUser._id, isAdmin: validUser.isAdmin },
+      process.env.JWT_SECRET,
+  );
+  ...
+  const token = jwt.sign(
+    { id: user._id, isAdmin: user.isAdmin },
+    process.env.JWT_SECRET,
+  );
+  ...
+  const token = jwt.sign(
+    { id: newUser._id, isAdmin: newUser.isAdmin },
+    process.env.JWT_SECRET,
+  );
+  ...
+```
 
 
 ### (43) Add listing api route at server(C) and MongoDB  
