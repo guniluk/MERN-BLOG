@@ -16,6 +16,9 @@ import {
   deleteUserStart,
   deleteUserSuccess,
   deleteUserFailure,
+  signoutStart,
+  signoutSuccess,
+  signoutFailure,
 } from '../redux/user/userSlice';
 import { useDispatch } from 'react-redux';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
@@ -122,6 +125,20 @@ export default function DashProfile() {
       dispatch(deleteUserFailure(error.message));
     }
   };
+  const handleSignout = async () => {
+    try {
+      dispatch(signoutStart());
+      const res = await fetch('/api/user/signout', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) {
+        dispatch(signoutFailure(data.message));
+        return;
+      }
+      dispatch(signoutSuccess(data));
+    } catch (error) {
+      dispatch(signoutFailure(error.message));
+    }
+  };
 
   return (
     <div className="max-w-lg mx-auto p-5 w-full">
@@ -176,7 +193,9 @@ export default function DashProfile() {
         <span className="cursor-pointer" onClick={() => setShowModal(true)}>
           Delete Account
         </span>
-        <span className="cursor-pointer">Sign Out</span>
+        <span className="cursor-pointer" onClick={handleSignout}>
+          Sign Out
+        </span>
       </div>
       {updateSuccess && (
         <Alert color="green" className="mt-5">
@@ -209,7 +228,7 @@ export default function DashProfile() {
             </h3>
           </div>
         </ModalBody>
-        <ModalFooter className="mx-auto">
+        <ModalFooter className="flex mx-auto gap-15">
           <Button onClick={() => setShowModal(false)}>Cancel</Button>
           <Button color="red" onClick={handleDelete}>
             Delete

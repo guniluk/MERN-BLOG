@@ -1247,59 +1247,118 @@ export const userSlice = createSlice({
 ```
 <hr/>
 
-
-
-
-### (41) signout at server(C)  
-- add signout router in auth.route.js  
-  > `import { signup, signin, signout } from '../controllers/auth.controller.js';`  
-  > ...  
-  > `router.get('/signout', signout);`    
-  > ...  
+44. signout at server(C)  
+- add signout router in auth.route.js 
+```javascript 
+  import { signup, signin, signout } from '../controllers/auth.controller.js';  
+  ...  
+  router.get('/signout', signout);    
+  ...  
+```
 - add signout function in auth.controller.js  
-  > ...  
-  > `export const signout = async (req, res, next) => {`  
-  > `try {`  
-  > &nbsp;&nbsp;`res.clearCookie('access_token');`  
-  > &nbsp;&nbsp;`res.status(200).json({ message: 'User logged out successfully!' });`  
-  > `} catch (error) {`  
-  > &nbsp;&nbsp;`next(error);}`  
-  > `};`  
-
-### (42) signout at client(B)  
-- create signout reducer in userSlice.js  
-  > ...  
-  > `signoutStart: (state) => {`  
-  > &nbsp;&nbsp;`state.loading = true;},`  
-  > `signoutSuccess: (state) => {`  
-  > &nbsp;&nbsp;`state.currentUser = null;`  
-  > &nbsp;&nbsp;`state.loading = false;`  
-  > &nbsp;&nbsp;`state.error = null;},`  
-  > `signoutFailure: (state, action) => {`  
-  > &nbsp;&nbsp;`state.error = action.payload;`  
-  > &nbsp;&nbsp;`state.loading = false;},`  
-  > ...
-- add signout handler in profile.jsx  
-  > ...  
-  > `import {signoutStart, signoutSuccess, signoutFailure,} from '../redux/user/userSlice';`  
-  > `export default function Profile() {`  
-  > ...  
-  > `const handleSignout = async () => {`  
-  > `try {`  
-  > &nbsp;&nbsp;`dispatch(signoutStart());`  
-  > &nbsp;&nbsp;`const res = await fetch('/api/auth/signout', {method: 'GET',});`  
-  > &nbsp;&nbsp;`const data = await res.json();`  
-  > &nbsp;&nbsp;`if (data.success === false) {`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`dispatch(signoutFailure(data.message));`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`return;}`  
-  > &nbsp;&nbsp;`dispatch(signoutSuccess(data));`  
-  > `} catch (error) {`  
-  > &nbsp;&nbsp;`dispatch(signoutFailure(error.message));`  
-  > `}`  
-  > ...  
+```javascript
+  ..  
+  export const signout = async (req, res, next) => {  
+    try {  
+      res.clearCookie('access_token');  
+      res.status(200).json({ message: 'User logged out successfully!' });  
+    } catch (error) {  
+      next(error);}  
+  };  
+```
 <hr/>
-the end of signup, login, logout 
-<hr/>   
+
+45. signout at client(B)  
+- create signout reducer in userSlice.js  
+```javascript
+  ...  
+  signoutStart: (state) => {state.loading = true;},  
+  signoutSuccess: (state) => {  
+    state.currentUser = null;  
+    state.loading = false; 
+    state.error = null;},  
+  signoutFailure: (state, action) => {  
+    state.error = action.payload;  
+    state.loading = false;},  
+  ...
+```
+- add signout handler in DashProfile.jsx  
+```javascript
+...  
+import {signoutStart, signoutSuccess, signoutFailure,} from '../redux/user/userSlice';  
+export default function Profile() {  
+...  
+const handleSignout = async () => {  
+  try {  
+    dispatch(signoutStart());  
+    const res = await fetch('/api/auth/signout', {method: 'GET',});  
+    const data = await res.json();  
+    if (data.success === false) {  
+      dispatch(signoutFailure(data.message));  
+      return;}  
+    dispatch(signoutSuccess(data));  
+  } catch (error) {  
+    dispatch(signoutFailure(error.message));  
+  }  
+}  
+```
+- modify header.jsx (add signout functionality)  
+```javascript
+  import {signoutStart, signoutSuccess,signoutFailure,} from '../redux/user/userSlice';
+...
+  const handleSignout = async () => {
+    try {
+      dispatch(signoutStart());
+      const res = await fetch('/api/user/signout', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) {
+        dispatch(signoutFailure(data.message));
+        return;
+      }
+      dispatch(signoutSuccess(data));
+    } catch (error) {
+      dispatch(signoutFailure(error.message));
+    }
+  };
+  ...
+  <DropdownItem onClick={handleSignout}>Sign Out</DropdownItem>
+  ...
+```
+- modify DashSidebar.jsx(add signout functionality)  
+```javascript
+  ...
+import {signoutStart,signoutSuccess,signoutFailure,} from '../redux/user/userSlice';
+import { useDispatch } from 'react-redux';
+export default function DashSidebar() {
+  ...
+  const dispatch = useDispatch();
+  ...
+  const handleSignout = async () => {
+  try {
+    dispatch(signoutStart());
+    const res = await fetch('/api/user/signout', { method: 'POST' });
+    const data = await res.json();
+    if (!res.ok) {
+      dispatch(signoutFailure(data.message));
+      return;
+    }
+    dispatch(signoutSuccess(data));
+  } catch (error) {
+    dispatch(signoutFailure(error.message));
+  }
+  };
+  return (
+    ...
+    <SidebarItem icon={HiArrowSmRight} onClick={handleSignout}>
+      Sign Out
+    </SidebarItem>
+    ...
+  )
+}
+```
+<hr/>
+
+
 
 ### (43) Add listing api route at server(C) and MongoDB  
 - create listing route, listing.route.js in routes folder   
