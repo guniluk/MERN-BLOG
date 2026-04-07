@@ -1588,7 +1588,50 @@ import OnlyAdminPrivateRoute from './components/OnlyAdminPrivateRoute.jsx';
 ```
 <hr/>
 
-50.
+50. add posts section to the dashboard at client(B)
+- add Posts tab at DashSidebar.jsx
+```javascript
+  ...
+  import { useSelector } from 'react-redux';
+  ...
+  export default function DashSidebar() {
+    const { currentUser } = useSelector((state) => state.user);
+    ...
+    return (
+      <Sidebar className="w-full md:w-56">
+        <SidebarItems>
+          <SidebarItemGroup flex flex-col gap-5>
+            ...
+            {currentUser.isAdmin && (
+              <SidebarItem
+                as={Link}
+                to="/dashboard?tab=posts"
+                active={tab === 'posts'}
+                icon={HiDocumentText}
+              >
+                Posts
+              </SidebarItem>
+            )}
+        ...
+    )
+  }
+```
+- add posts at Dashboard.jsx
+```javascript
+  ...
+  import DashPosts from '../components/DashPosts';
+  ...
+    </div>
+      {/* right side */}
+      {tab === 'profile' && <DashProfile />}
+      {/* posts */}
+      {tab === 'posts' && <DashPosts />}
+    </div>
+  ...
+```
+- just create DashPosts.jsx 
+<hr/>
+
 
 
 
