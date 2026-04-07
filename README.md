@@ -1524,7 +1524,7 @@ import OnlyAdminPrivateRoute from './components/OnlyAdminPrivateRoute.jsx';
     const newPost = new Post({...req.body, slug, userId: req.user.id,});
     try {
       const savedPost = await newPost.save();
-      res.status(201).json({ message: 'Post created successfully!' });
+      res.status(201).json(savedPost);
     } catch (error) {
       next(error);
     }
@@ -1532,6 +1532,64 @@ import OnlyAdminPrivateRoute from './components/OnlyAdminPrivateRoute.jsx';
 ```
 - test to create post by using insomnia 
 <hr/>
+
+49. create post functionality at CreatePost.jsx in pages folder at client(B)  
+```javascript
+  ...
+  import { useState } from 'react';
+  import { useNavigate } from 'react-router-dom';
+  export default function CreatePost() {
+    const [file, setFile] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [publishError, setPublishError] = useState(null);
+    const navigate = useNavigate();
+    const handleUploadImage = () => {console.log(file);};
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      if (!formData.title || !formData.content) {
+        return alert('All fields are required');}
+      try {
+        const res = await fetch('/api/post/create', {
+          method: 'POST', headers: {'Content-Type': 'application/json',},
+          body: JSON.stringify(formData),});
+        const data = await res.json();
+        if (!res.ok) {
+          setPublishError(data.message);
+          return;}
+        alert('Post created successfully');
+        setFormData({});
+        setFile(null);
+        setPublishError(null);
+        navigate(`/post/${data.slug}`);
+      } catch (error) {
+        setPublishError(error.message);}
+    };
+
+    return (
+    ...
+    <form onSubmit={handleSubmit}>
+      ...
+      <TextInput
+        onChange={(e) =>
+        setFormData({ ...formData, title: e.target.value })}/>
+      <Select
+        onChange={(e) =>
+        setFormData({ ...formData, category: e.target.value })}>
+      ...
+      <FileInput
+        onChange={(e) => setFile(e.target.files[0])}/>
+      <Button onClick={handleUploadImage}>Upload Image</Button>
+      <ReactQuill
+        onChange={(value) => setFormData({ ...formData, content: value })}/>
+        ...
+      {publishError && (<Alert color="failure">{publishError}</Alert>)}
+      </form>
+  }
+```
+<hr/>
+
+50.
+
 
 
 ### (43) Add listing api route at server(C) and MongoDB  
