@@ -1475,7 +1475,63 @@ import OnlyAdminPrivateRoute from './components/OnlyAdminPrivateRoute.jsx';
 ```
 <hr/>
 
-
+48. create post api router at server(C)  
+- create  post.route.js  in routes folder  
+```javascript
+  import express from 'express';
+  import { verifyToken } from '../utils/verifyUser.js';
+  import { create } from '../controllers/post.controller.js';
+  const router = express.Router();
+  router.post('/create', verifyToken, create);
+  export default router;
+```
+- modify index.js(add post router)  
+```javascript
+  ...
+  import postRoutes from './routes/post.router.js';
+  ...
+  app.use('/api/post', postRoutes);
+  ...
+```
+- create post model in post.model.js  
+```javascript
+  import mongoose from 'mongoose';
+  const postSchema = new mongoose.Schema(
+    {
+      userId: {type: String, required: true,},
+      content: {type: String, required: true,},
+      title: {type: String, required: true, unique: true,},
+      image: { type: String, default:'https://~jpg',},
+      category: {type: String,default: 'uncategorized',},
+      slug: {type: String, required: true, unique: true,},},
+    { timestamps: true },);
+  const Post = mongoose.model('Post', postSchema);
+  export default Post;
+```
+- create post controller post.controller.js in controllers folder  
+```javascript
+  import { errorHandler } from '../utils/error.js';
+  import Post from '../models/post.model.js';
+  export const create = async (req, res, next) => {
+    if (!req.user.isAdmin) { //from verifyToken
+      return next(errorHandler(403, 'You are not authorized!'));
+    }
+    if (!req.body.title || !req.body.content) {
+      return next(errorHandler(400, 'All fields are required!'));
+    }
+    const slug = req.body.title.toLowerCase().split(' ').join('-')
+          .replace(/[^a-z0-9-]/g, '');
+    const newPost = new Post({...req.body, slug, userId: req.user.id,});
+    try {
+      const savedPost = await newPost.save();
+      res.status(201).json({ message: 'Post created successfully!' });
+    } catch (error) {
+      next(error);
+    }
+  };
+```
+- test to create post by using insomnia 
+<hr/>
 
 
 ### (43) Add listing api route at server(C) and MongoDB  

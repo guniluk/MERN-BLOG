@@ -18,7 +18,7 @@ export default function CreatePost() {
             className="flex-1"
           />
           <Select>
-            <option value="uncatagorized">Select a Category</option>
+            <option value="uncategorized">Select a Category</option>
             <option value="javascript">Javascript</option>
             <option value="reactjs">React.JS</option>
             <option value="nextjs">Next.JS</option>
