@@ -46,7 +46,7 @@ export default function DashSidebar() {
   return (
     <Sidebar className="w-full md:w-56">
       <SidebarItems>
-        <SidebarItemGroup flex flex-col gap-5>
+        <SidebarItemGroup className="flex flex-col gap-5">
           <SidebarItem
             as={Link}
             to="/dashboard?tab=profile"

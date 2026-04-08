@@ -163,6 +163,7 @@ export default function DashProfile() {
           <img
             src={imageFileUrl || currentUser.profilePicture}
             alt="user"
+            referrerPolicy="no-referrer"
             className="rounded-full w-full h-full border-8 border-[lightgray] object-cover"
           />
         </div>
