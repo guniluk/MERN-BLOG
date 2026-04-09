@@ -31,7 +31,7 @@ export default function DashPosts() {
         const data = await res.json();
         if (res.ok) {
           setUserPosts(data.posts);
-          if (data.posts < 9) {
+          if (data.posts.length < 9) {
             setShowMore(false);
           }
         }
@@ -139,7 +139,7 @@ export default function DashPosts() {
                   <TableCell>
                     <Link
                       className="text-emerald-500 hover:underline"
-                      to={`/update-post/${post._id}}`}
+                      to={`/update-post/${post._id}`}
                     >
                       <span>Edit</span>
                     </Link>

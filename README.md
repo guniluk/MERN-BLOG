@@ -1867,7 +1867,168 @@ import OnlyAdminPrivateRoute from './components/OnlyAdminPrivateRoute.jsx';
 ```
 <hr/>
 
-55. 
+55. add update post functionaluty at server(C) and client(B)
+- modify post.router.js at server(C)  
+```javascript
+  ...
+  import {updatepost} from '../controllers/post.controller.js';
+  ...
+  router.put('/updatepost/:postId/:userId', verifyToken, updatepost);
+```
+- modify post.controller.js at server(C)  
+```javascript
+  export const updatepost = async (req, res, next) => {
+  if (!req.user.isAdmin || req.user.id !== req.params.userId) {
+    return next(
+      errorHandler(403, 'You are not authorized to update this post!'),);
+  }
+  try {
+    const updatedPost = await Post.findByIdAndUpdate(
+      req.params.postId,
+      {
+        $set: {
+          title: req.body.title,
+          content: req.body.content,
+          category: req.body.category,
+          image: req.body.image,
+        },
+      },
+      { new: true },
+    );
+    res.status(200).json(updatedPost);
+  } catch (error) {
+    next(error);
+  }
+};
+```
+- modify DashPosts.jsx at client(B)  
+```javascript
+  ...
+         <Link
+            to={`/update-post/${post._id}`}
+          >
+            <span>Edit</span>
+          </Link>
+```
+- modify App.jsx at client(B)  
+```javascript
+  ...
+  import UpdatePost from './pages/UpdatePost.jsx';
+  ...
+    <Route path="/update-post/:postId" element={<UpdatePost />} />
+  ...
+```
+- create UpdatePost.jsx at client(B)
+```javascript
+  import { Alert, Button, FileInput, Select, TextInput } from 'flowbite-react';
+  import ReactQuill from 'react-quill-new';
+  import 'react-quill-new/dist/quill.snow.css';
+  import { useEffect, useState } from 'react';
+  import { useNavigate, useParams } from 'react-router-dom';
+  import { useSelector } from 'react-redux';
+
+  export default function UpdatePost() {
+    const [file, setFile] = useState(null);
+    const [formData, setFormData] = useState({
+      title: '',
+      category: 'uncategorized',
+      content: '',
+    const [publishError, setPublishError] = useState(null);
+    const navigate = useNavigate();
+    const { postId } = useParams();
+    const { currentUser } = useSelector((state) => state.user);
+
+    useEffect(() => {
+      const fetchPost = async () => {
+        try {
+          const res = await fetch(`/api/post/getposts?postId=${postId}`);
+          const data = await res.json();
+          if (res.ok) {
+            if (data.posts && data.posts.length > 0) {
+              setFormData(data.posts[0]);
+            }
+            setPublishError(null);
+          } else {
+            setPublishError(data.message);
+          }
+        } catch (error) {
+          setPublishError(error.message);}};
+      if (postId) {
+        fetchPost();}
+    }, [postId]);
+    ...
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      if (!formData.title || !formData.content) {
+        return setPublishError('All fields are required');
+      }
+      try {
+        const res = await fetch(
+          `/api/post/updatepost/${formData._id}/${currentUser._id}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+          },
+        );
+        const data = await res.json();
+        if (!res.ok) {
+          setPublishError(data.message);
+          return;
+        }
+        setPublishError(null);
+        navigate(`/post/${data.slug}`);
+      } catch (error) {
+        setPublishError(error.message);
+      }
+    };
+
+    return (
+      <div className="max-w-6xl p-3 mx-auto min-h-screen">
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          <div className="flex flex-col gap-4 sm:flex-row justify-between">
+            <TextInput
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, title: e.target.value }))
+              }
+              value={formData.title || ''}
+            />
+            <Select
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, category: e.target.value }))
+              }
+              value={formData.category || 'uncategorized'}
+            >
+              <option value="uncategorized">Select a Category</option>
+              <option value="javascript">Javascript</option>
+            </Select>
+          </div>
+          ...
+          <ReactQuill
+            onChange={(value) => {
+              setFormData((prev) => ({ ...prev, content: value }));
+            }}
+            value={formData.content || ''}
+          />
+          <Button type="submit" color="green">
+            Update Post
+          </Button>
+          {publishError && (
+            <Alert color="failure" className="mt-5">
+              {publishError}
+            </Alert>
+          )}
+        </form>
+      </div>
+    );
+  }
+```
+
+
+
+
 
 ### (43) Add listing api route at server(C) and MongoDB  
 - create listing route, listing.route.js in routes folder   
