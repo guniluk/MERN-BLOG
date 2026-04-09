@@ -1752,8 +1752,46 @@ import OnlyAdminPrivateRoute from './components/OnlyAdminPrivateRoute.jsx';
 ```
 <hr/>
 
-53. 
+53. show more posts inside dashboard at client(B)
+- modify DashPosts.
+```javascript
+  ...
+  const [showMore, setShowMore] = useState(true);
+  ...
+    if (res.ok) {
+      setUserPosts(data.posts);
+      if (data.posts < 9) {
+        setShowMore(false);}
+    }
+  ...
+  const handleShowMore = async () => {
+  const startIndex = userPosts.length;
+  try {
+    const res = await fetch(
+      `/api/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`,
+    );
+    const data = await res.json();
+    if (res.ok) {
+      setUserPosts((prev) => [...prev, ...data.posts]);
+      if (data.posts.length < 9) { setShowMore(false);}
+    }
+  } catch (error) {
+    console.log(error);
+  }
+  };
+  ...
+      {showMore && (
+      <button
+        className="w-full text-teal-500 self-center text-sm py-7"
+        onClick={handleShowMore}
+      >
+        Show More
+      </button>
+     )}
+```
+<hr/>
 
+54. 
 
 
 

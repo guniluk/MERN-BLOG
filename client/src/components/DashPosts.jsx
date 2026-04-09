@@ -13,7 +13,8 @@ import { Link } from 'react-router-dom';
 export default function DashPosts() {
   const { currentUser } = useSelector((state) => state.user);
   const [userPosts, setUserPosts] = useState([]);
-  console.log(userPosts);
+  const [showMore, setShowMore] = useState(true);
+  // console.log(userPosts);
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -21,6 +22,9 @@ export default function DashPosts() {
         const data = await res.json();
         if (res.ok) {
           setUserPosts(data.posts);
+          if (data.posts < 9) {
+            setShowMore(false);
+          }
         }
       } catch (error) {
         console.log(error);
@@ -30,8 +34,25 @@ export default function DashPosts() {
       fetchPosts();
     }
   }, [currentUser._id, currentUser.isAdmin]);
+  const handleShowMore = async () => {
+    const startIndex = userPosts.length;
+    try {
+      const res = await fetch(
+        `/api/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`,
+      );
+      const data = await res.json();
+      if (res.ok) {
+        setUserPosts((prev) => [...prev, ...data.posts]);
+        if (data.posts.length < 9) {
+          setShowMore(false);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
-    <div className="table-auto  overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-thumb-slate-300 scrollbar-track-slate-100 dark:scrollbar-thumb-slate-500 dark:scrollbar-track-slate-700">
+    <div className="p-2 ml-1 mr-1 overflow-x-scroll md:table-auto md:ml-5 md:mr-5 md:w-full md:mx-auto scrollbar scrollbar-thumb-slate-300 scrollbar-track-slate-100 dark:scrollbar-thumb-slate-500 dark:scrollbar-track-slate-700">
       {currentUser.isAdmin && userPosts.length > 0 ? (
         <>
           <Table hoverable className="shadow-md">
@@ -89,6 +110,14 @@ export default function DashPosts() {
               </TableBody>
             ))}
           </Table>
+          {showMore && (
+            <button
+              className="w-full text-teal-500 self-center text-sm py-7"
+              onClick={handleShowMore}
+            >
+              Show More
+            </button>
+          )}
         </>
       ) : (
         <p>You have no post yet!</p>
