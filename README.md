@@ -1791,9 +1791,83 @@ import OnlyAdminPrivateRoute from './components/OnlyAdminPrivateRoute.jsx';
 ```
 <hr/>
 
-54. 
+54. add delet post functionality at server(C) and client(B)
+- modify post.route.js  
+```javascript
+  import {deletepost} from '../controllers/post.controller.js';
+  ...
+  router.delete('/deletepost/:postId/:userId', verifyToken, deletepost);
+```
+- modify post.controller.js  
+```javascript
+  export const deletepost = async (req, res, next) => {
+  if (!req.user.isAdmin || req.user.id !== req.params.userId) {
+    return next(
+      errorHandler(403, 'You are not authorized to delete this post!'),
+    );}
+  try {
+    await Post.findByIdAndDelete(req.params.postId);
+    res.status(200).json({ message: 'Post deleted successfully!' });
+  } catch (error) {
+    next(error);}
+  };
+```
+- modify DashPosts.jsx at client(B)  
+```javascript
+  ...
+  import {Modal,ModalHeader,ModalBody,ModalFooter,Button,} from 'flowbite-react';
+  import { HiOutlineExclamationCircle } from 'react-icons/hi';
+  ...
+  const [showModal, setShowModal] = useState(false);
+  const [postIdToDelete, setPostIdToDelete] = useState('');
+  ...
+  const handleDeletePost = async () => {
+  setShowModal(false);
+  try {
+    const res = await fetch(
+      `/api/post/deletepost/${postIdToDelete}/${currentUser._id}`,
+      {method: 'DELETE',},);
+    const data = await res.json();
+    if (res.ok) {
+      setUserPosts((prev) => prev.filter((post) => post._id !== postIdToDelete),);
+    } else {console.log(data.message);}
+  } catch (error) {console.log(error);}};
+  ...
+  return (
+    ...
+      <span
+        onClick={() => {
+          setShowModal(true);
+          setPostIdToDelete(post._id);}}>
+        Delete
+      </span>
+    ...
+      <Modal
+      show={showModal}
+      onClose={() => setShowModal(false)}
+    >
+      <ModalHeader>Delete Account</ModalHeader>
+      <ModalBody>
+        <div className="text-center">
+          <HiOutlineExclamationCircle className="w-17 h-17 text-gray-400 dark:text-gray-200 mb-5 mx-auto" />
+          <h3 className="mb-5 text-gray-500 dark:text-gray-200 text-lg">
+            Are you sure you want to delete your post? This action cannot be
+            undone^^
+          </h3>
+        </div>
+      </ModalBody>
+      <ModalFooter className="flex mx-auto gap-15">
+        <Button onClick={() => setShowModal(false)}>Cancel</Button>
+        <Button color="red" onClick={handleDeletePost}>
+          Delete
+        </Button>
+      </ModalFooter>
+    </Modal>
+  )
+```
+<hr/>
 
-
+55. 
 
 ### (43) Add listing api route at server(C) and MongoDB  
 - create listing route, listing.route.js in routes folder   
