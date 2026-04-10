@@ -2063,8 +2063,113 @@ import OnlyAdminPrivateRoute from './components/OnlyAdminPrivateRoute.jsx';
 ```
 <hr/>
 
-57. create get users  at client(B)  
-- modify DashProfile.jsx
+57.  show users at admin dashboard in client(B)  
+- modify sidebar at client(B)  (DashSidebar.jsx)  
+```javascript
+  ...
+  {currentUser.isAdmin && (
+    <SidebarItem as={Link} to="/dashboard?tab=users"
+      active={tab === 'users'} icon={HiOutlineUserGroup}>
+      Users
+    </SidebarItem>)
+  }
+  ...
+```
+- modify Dashboard.jsx at client(B)  
+```javascript
+  import DashUsers from '../components/DashUsers';
+  ...
+    {tab === 'users' && <DashUsers />}
+  ...
+```
+- create DashUsers.jsx at client(B)
+```javascript
+  ...
+  export default function DashUsers() {
+    const [users, setUsers] = useState([]);
+    const [userIdToDelete, setUserIdToDelete] = useState('');
+    ...
+    useEffect(() => {
+      const fetchUsers = async () => {
+        try {
+          const res = await fetch(`/api/user/getusers`);
+          const data = await res.json();
+          if (res.ok) {
+            setUsers(data.users); //from user.controller.js
+            if (data.users.length < 9) {setShowMore(false);}}
+        } catch (error) { console.log(error); }
+      };
+      if (currentUser.isAdmin) { fetchUsers();} }, [currentUser]);
+    const handleShowMore = async () => {
+      const startIndex = users.length;
+      try {
+        const res = await fetch(`/api/user/getusers?startIndex=${startIndex}`);
+        const data = await res.json();
+        if (res.ok) {
+          setUsers((prev) => [...prev, ...data.users]);
+          if (data.users.length < 9) { setShowMore(false);}}
+      } catch (error) {console.log(error);}};
+    const handleDeleteUser = async () => {
+      setShowModal(false);
+      try {
+        const res = await fetch(
+          `/api/user/deleteuser/${userIdToDelete}/${currentUser._id}`,
+          {method: 'DELETE',},);
+        const data = await res.json();
+        if (res.ok) {
+          setUsers((prev) => prev.filter((user) => user._id !== userIdToDelete));
+        } else { console.log(data.message);}
+      } catch (error) {console.log(error);}
+    };
+    return (
+      <div>
+        {currentUser.isAdmin && users.length > 0 ? (
+          <>
+            <Table hoverable className="shadow-md">
+              <TableHead>
+                <TableRow>  
+                  <TableHeadCell>Username</TableHeadCell>
+                  <TableHeadCell>Delete</TableHeadCell>
+                </TableRow>
+              </TableHead>
+              {users.map((user) => (
+                <TableBody key={user._id} className="divide-y">
+                  <TableRow className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                    <TableCell className="font-medium text-gray-900 dark:text-white">
+                      {user.username}
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        onClick={() => {
+                          setShowModal(true);
+                          setUserIdToDelete(user._id);}}>
+                        Delete
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              ))}
+            </Table>
+            {showMore && (
+              <button
+                className="w-full text-teal-500 self-center text-sm py-7"
+                onClick={handleShowMore}
+              >
+                Show More
+              </button>
+            )}
+          </>
+        ) : (
+          <p>You have no users to show</p>
+        )}
+        ...
+      </div>
+    );
+  }
+```
+<hr/>
+
+58. 11
 
 
 ### (43) Add listing api route at server(C) and MongoDB  
