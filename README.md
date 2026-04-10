@@ -2169,7 +2169,36 @@ import OnlyAdminPrivateRoute from './components/OnlyAdminPrivateRoute.jsx';
 ```
 <hr/>
 
-58. 11
+58. add delete user functionality at server(C) and client(B)
+- modify user.controller.js at server(C)  
+```javascript
+  ...
+  export const deleteUser = async (req, res, next) => {
+    if (!req.user.isAdmin && req.user.id !== req.params.userId) {
+      return next(errorHandler(401, 'You can delete only your own account!'));
+    }
+    ...
+  }
+```
+- modify DashUser.jsx at client(B)  
+```javascript
+  ...
+    const handleDeleteUser = async () => {
+    setShowModal(false);
+    try {
+      const res = await fetch(`/api/user/delete/${userIdToDelete}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUsers((prev) => prev.filter((user) => user._id !== userIdToDelete));
+      } else { console.log(data.message);}
+    } catch (error) { console.log(error);}
+    };
+  ...
+```
+
+
 
 
 ### (43) Add listing api route at server(C) and MongoDB  

@@ -22,7 +22,6 @@ export default function DashUsers() {
   const [showMore, setShowMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [userIdToDelete, setUserIdToDelete] = useState('');
-  // console.log(userPosts);
   // console.log(currentUser);
   useEffect(() => {
     const fetchUsers = async () => {
@@ -42,7 +41,7 @@ export default function DashUsers() {
     if (currentUser.isAdmin) {
       fetchUsers();
     }
-  }, [currentUser]);
+  }, [currentUser._id, currentUser.isAdmin]);
   const handleShowMore = async () => {
     const startIndex = users.length;
     try {
@@ -61,14 +60,10 @@ export default function DashUsers() {
   const handleDeleteUser = async () => {
     setShowModal(false);
     try {
-      const res = await fetch(
-        `/api/user/deleteuser/${userIdToDelete}/${currentUser._id}`,
-        {
-          method: 'DELETE',
-        },
-      );
+      const res = await fetch(`/api/user/delete/${userIdToDelete}`, {
+        method: 'DELETE',
+      });
       const data = await res.json();
-      console.log(data);
       if (res.ok) {
         setUsers((prev) => prev.filter((user) => user._id !== userIdToDelete));
       } else {
@@ -156,7 +151,7 @@ export default function DashUsers() {
         onClose={() => setShowModal(false)}
         popup
       >
-        <ModalHeader>Delete Account</ModalHeader>
+        <ModalHeader>Delete User</ModalHeader>
         <ModalBody>
           <div className="text-center">
             <HiOutlineExclamationCircle className="w-17 h-17 text-gray-400 dark:text-gray-200 mb-5 mx-auto" />
