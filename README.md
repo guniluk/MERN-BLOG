@@ -2025,9 +2025,46 @@ import OnlyAdminPrivateRoute from './components/OnlyAdminPrivateRoute.jsx';
     );
   }
 ```
+<hr/>
 
+56. create get users api route at server(C)  
+- modify user.route.js  
+```javascript
+  ...
+  import {getUsers} from '../controllers/user.controller.js';
+  ...
+  router.get('/getusers', verifyToken, getUsers);
+```
+- modify user.controller.js  
+```javascript
+  export const getUsers = async (req, res, next) => {
+  if (!req.user.isAdmin) {
+    return next(errorHandler(403, 'You are not authorized!'));}
+  try {
+    const startIndex = parseInt(req.query.startIndex) || 0;
+    const limit = parseInt(req.query.limit) || 9;
+    const sortDirection = req.query.sort === 'asc' ? 1 : -1;
+    const users = await User.find()
+      .sort({ createdAt: sortDirection })
+      .skip(startIndex)
+      .limit(limit);
+    const userWithoutPassword = users.map((user) => {
+      const { password, ...rest } = user._doc;
+      return rest;
+    });
+    const totalUsers = await User.countDocuments();
+    const now = new Date();
+    const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate(),);
+    const lastMonthUsers = await User.countDocuments({createdAt: { $gte: oneMonthAgo },});
+    res.status(200)
+       .json({ users: userWithoutPassword, totalUsers, lastMonthUsers });
+  } catch (error) {next(error);}
+  };
+```
+<hr/>
 
-
+57. create get users  at client(B)  
+- modify DashProfile.jsx
 
 
 ### (43) Add listing api route at server(C) and MongoDB  
