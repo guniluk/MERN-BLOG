@@ -16,3 +16,29 @@ body {
 .ql-editor {
   font-size: 1.1rem;
 }
+
+.post-content p {
+  margin-bottom: 0.5rem;
+}
+
+.post-content h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.post-content h2 {
+  font-size: 1.4rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.post-content a {
+  color: rgb(40, 40, 161);
+  text-decoration: none;
+}
+.dark .post-content a {
+  color: rgb(215, 170, 38);
+}
+.post-content a:hover {
+  text-decoration: underline;
+}

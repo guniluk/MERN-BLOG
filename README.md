@@ -2198,8 +2198,85 @@ import OnlyAdminPrivateRoute from './components/OnlyAdminPrivateRoute.jsx';
   ...
 ```
 
+59. complete post page functionality at client(B)  
+- add route at App.jsx  
+```javascript
+  ...
+  import PostPage from './pages/Postpage.jsx';
+  ...
+    <Route path="/post/:postSlug" element={<PostPage />} />
+  ...
+```
+- create Postpage.jsx  
+```javascript
+  import { Button, Spinner } from 'flowbite-react';
+  import { useEffect, useState } from 'react';
+  import { Link, useParams } from 'react-router-dom';
+  export default function PostPage() {
+    const { postSlug } = useParams();
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+    const [post, setPost] = useState(null);
+    useEffect(() => {
+      const fetchPost = async () => {
+        try {
+          setLoading(true);
+          const res = await fetch(`/api/post/getposts?slug=${postSlug}`);
+          const data = await res.json();
+          console.log(data);
+          if (!res.ok) {
+            setLoading(false);
+            setError(true);
+            return;
+          }
+          setLoading(false);
+          setError(false);
+          setPost(data.posts[0]);
+        } catch (error) {
+          setLoading(false);
+          setError(true);}};
+      fetchPost(); }, [postSlug]);
+    if (loading)
+      return (
+        <div className="flex justify-center items-center min-h-screen"><Spinner size="xl" /></div>
+      );
+    return (
+      <main className="flex flex-col p-3 max-w-6xl mx-auto min-h-screen">
+        <h1> {post && post.title}</h1>
+        <Link to={`/search?category=${post && post.category}`}>
+          <Button color="gray" pill size="sm"> {post && post.category} </Button>
+        </Link>
+        <img src={post && post.image} alt={post && post.title}/>
+        <div>
+          <span>{post && new Date(post.createdAt).toLocaleDateString()}</span>
+          <span>{post && (post.content.length / 2).toFixed(0)} mins read</span>
+        </div>
+        <div
+          dangerouslySetInnerHTML={{ __html: post && post.content }}
+        ></div>
+      </main>
+    );
+  }
+```
+- modify index.css  
+```css
+  .post-content p {
+  margin-bottom: 0.5rem;
+  }
+  ...
+  .post-content a {
+    color: rgb(40, 40, 161);
+    text-decoration: none;
+  }
+  .dark .post-content a {
+    color: rgb(215, 170, 38);
+  }
+  ...
+```
+<hr/>
 
-
+60. 11
+###>
 
 ### (43) Add listing api route at server(C) and MongoDB  
 - create listing route, listing.route.js in routes folder   
