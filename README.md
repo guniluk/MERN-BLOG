@@ -2318,8 +2318,150 @@ import OnlyAdminPrivateRoute from './components/OnlyAdminPrivateRoute.jsx';
 ```
 <hr/>
   
-61. 
+61. add comment section to the post page at client(B) and server(C)  
+- create comment.model.js at models folder in server(C)  
+```javascript
+  import mongoose from 'mongoose';
+  const commentSchema = new mongoose.Schema(
+    {
+      postId: {type: String, required: true,},
+      content: {type: String, required: true,},
+      userId: {type: String, required: true,},
+      likes: {type: Array, default: [],},
+      numberOfLikes: {type: Number, default: 0,},
+    },
+    { timestamps: true,},
+  );
+  const Comment = mongoose.model('Comment', commentSchema);
+  export default Comment;
+```
+- add comment route at index.js in server(C)  
+```javascript
+  ...
+  import commentRoutes from './routes/comment.route.js';
+  ...
+  app.use('/api/comment', commentRoutes);
+```
+- create comment.route.js at routes folder in server(C)  
+```javascript
+  import express from 'express';
+  import { createComment } from '../controllers/comment.controller.js';
+  import { verifyToken } from '../utils/verifyUser.js';
+  const router = express.Router();
+  router.post('/create', verifyToken, createComment);
+  export default router;
+```
+- create comment.controller.js at controllers folder in server(C)  
+```javascript
+  import { errorHandler } from '../utils/error.js';
+  import Comment from '../models/comment.model.js';
+  export const createComment = async (req, res, next) => {
+    try {
+      const { content, postId, userId } = req.body;
+      if (userId !== req.user.id) {
+        return next(
+          errorHandler(403, 'You are not authorized to create a comment!'),
+        ); }
+      if (!content || !postId || !userId) {
+        return next(errorHandler(400, 'Text fields are required!'));
+      }
+      const newComment = new Comment({ content, postId, userId });
+      await newComment.save();
+      res.status(200).json(newComment);
+    } catch (error) { next(error);}
+  };
+```
+- make ScrollToTop.jsx at components folder in client(B)  
+```javascript
+  import { useEffect } from 'react';
+  import { useLocation } from 'react-router-dom';
+  export default function ScrollToTop() {
+    const { pathname } = useLocation();
+    useEffect(() => { window.scrollTo(0, 0);}, [pathname]);
+    return null;
+  }
+```
+- add ScrollToTop function at App.jsx in client(B)  
+```javascript
+  import ScrollToTop from './components/ScrollToTop.jsx';
+  function App() {
+    return (
+      <BrowserRouter>
+        <ScrollToTop />
+      ..
+    )
+  }
+```
+- create CommentSection.jsx at components folder in client(B) 
+```javascript
+  import { Alert, Button, Textarea } from 'flowbite-react';
+  import { useSelector } from 'react-redux';
+  import { Link } from 'react-router-dom';
+  import { useState, useEffect } from 'react';
+  export default function CommentSection({ postId }) {
+    const { currentUser } = useSelector((state) => state.user);
+    const [comment, setComment] = useState('');
+    const [commentError, setCommentError] = useState(null);
+    useEffect(() => {
+      if (commentError) {
+        const timer = setTimeout(() => {setCommentError(null);}, 2000);
+        return () => clearTimeout(timer);}}, [commentError]);
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      if (comment.length > 300) {return;}
+      try {
+        const res = await fetch('/api/comment/create', {
+          method: 'POST', headers: {'Content-Type': 'application/json',},
+          body: JSON.stringify({
+            postId, content: comment, userId: currentUser._id,}),});
+        const data = await res.json();
+        if (!res.ok) {
+          setCommentError(data.message);
+          return;}
+        setComment('');
+        setCommentError(null);
+      } catch (error) {setCommentError(error.message);}};
+    return (
+      <div className="max-w-2xl mx-auto w-full p-3">
+        {currentUser ? (
+          <div>
+            <p>Signed in as: </p>
+            <img src={currentUser.profilePicture}/>
+            <Link to="/dashboard?tab=profile"> {currentUser.username}</Link>
+          </div>) : (
+          <div>
+            You must login to comment
+            <Link to="/sign-in">
+              Sign In
+            </Link>
+          </div> )}
+        {currentUser && (
+          <form onSubmit={handleSubmit}>
+            <Textarea
+              onChange={(e) => setComment(e.target.value)}
+              value={comment}/>
+            <div className="flex justify-between items-center">
+              <p className="text-sm"> {300 - comment.length} haracters remaining </p>
+              <Button outline color="green" type="submit">Submit</Button>
+            </div>
+            {commentError && ( <Alert color="red" className="mt-5">{commentError}</Alert>)}
+          </form>
+        )}
+      </div>
+    );
+  }
+```
+- modify Postpage.jsx at pages folder in client(B)  
+```javascript
+  ...
+  import CommentSection from '../components/CommentSection';
+  ...
+    <CommentSection postId={post._id} />
+    ...
+```
+<hr/>
 
+62. 11
 
 
 
