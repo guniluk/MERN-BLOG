@@ -2461,9 +2461,127 @@ import OnlyAdminPrivateRoute from './components/OnlyAdminPrivateRoute.jsx';
 ```
 <hr/>
 
-62. 11
+62. show comments to the post page at server(c) and client(B)  
+- add comments route of post at comment.route.js in router folder 
+```javascript
+  import {getPostComments} from '../controllers/comment.controller.js';
+  ...
+  router.get('/getPostComments/:postId', getPostComments);
+  ...
+```
+- add comments controller at comment.controller.js at server(C)  
+```javascript
+  export const getPostComments = async (req, res, next) => {
+    try {
+      const comments = await Comment.find({ postId: req.params.postId }).sort({createdAt: -1,});
+      res.status(200).json(comments);
+    } catch (error) {next(error);}
+  };
+```
+- to get user info who commented, add user route at user.route.js in routes folder  
+```javascript
+  import {getuser} from '../controllers/user.controller.js';
+  ...
+  router.get('/:userId', getuser);
+```
+- add user controller at user.controller.js in controllers folder  
+```javascript
+  export const getuser = async (req, res, next) => {
+    try {
+      const user = await User.findById(req.params.userId);
+      if (!user) {
+        return next(errorHandler(404, 'User not found!'));
+      }
+      const { password, ...rest } = user._doc;
+      res.status(200).json(rest);
+    } catch (error) {next(error)}
+  };
+```
+- add exist comments at CommentSection.jsx at components folder in client
+```javascript
+import Comment from './Comment';
+...
+  const [comments, setComments] = useState([]);
+  ...
+  useEffect(() => {
+  const fetchComments = async () => {
+    try {
+      const res = await fetch(`/api/comment/getPostComments/${postId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setComments(data);
+      }} catch (error) {console.log(error);}};
+  fetchComments();
+  }, [postId]);
+  ...
+  const handleSubmit = async (e) => {
+  ...
+    setComments([data, ...comments]);
+    ...
+  }
+  return (
+    ...
+    {comments.length === 0 ? (<div className="my-5 text-sm">No comments yet</div>) : (
+    <>
+      <div className="flex text-sm items-center my-3 gap-2">
+        <p>Comments:</p>
+        <div className="border border-slate-500 py-1 px-3 rounded-sm">
+          <p>{comments.length}</p>
+        </div>
+      </div>
+      {comments.map((comment) => (
+        <Comment key={comment._id} comment={comment} />))}
+    </>
+    )}
+  )
+```
+- create Comment.jsx at components folder in client  
+```javascript
+  import { useEffect, useState } from 'react';
+  import dayjs from 'dayjs';
+  import relativeTime from 'dayjs/plugin/relativeTime';
+  dayjs.extend(relativeTime);
+  export default function Comment({ comment }) {
+    const [user, setUser] = useState({});
+    useEffect(() => {
+      const getUser = async () => {
+        try {
+          const res = await fetch(`/api/user/${comment.userId}`);
+          if (res.ok) {
+            const data = await res.json();
+            setUser(data);
+          }
+        } catch (error) {console.log(error);}};
+      getUser();}, [comment]);
+    return (
+      <div className="flex p-4 border-b border-slate-500 dark:border-gray-600 text-sm">
+        <div className="shrink-0 mr-3">
+          <img
+            className="w-10 h-10 rounded-full bg-gray-200"
+            src={user.profilePicture}
+            alt={user.username}
+          />
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center mb-1">
+            <span className="font-bold mr-2 text-xs truncate">
+              {user ? `@${user.username}` : 'anonymous user'}
+            </span>
+            <span className="text-gray-500 text-xs dark:text-gray-200">
+              {dayjs(comment.createdAt).fromNow()}
+            </span>
+          </div>
+          <p className="text-gray-500 pb-2 dark:text-gray-200">
+            {comment.content}
+          </p>
+        </div>
+      </div>
+    );
+  }
+```
+<hr/>
 
-
+63. 111
 
 
 ### (43) Add listing api route at server(C) and MongoDB  

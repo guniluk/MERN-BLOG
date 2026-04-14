@@ -2,11 +2,13 @@ import { Alert, Button, Textarea } from 'flowbite-react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import Comment from './Comment';
 
 export default function CommentSection({ postId }) {
   const { currentUser } = useSelector((state) => state.user);
   const [comment, setComment] = useState('');
   const [commentError, setCommentError] = useState(null);
+  const [comments, setComments] = useState([]);
 
   useEffect(() => {
     if (commentError) {
@@ -16,6 +18,21 @@ export default function CommentSection({ postId }) {
       return () => clearTimeout(timer);
     }
   }, [commentError]);
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const res = await fetch(`/api/comment/getPostComments/${postId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setComments(data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchComments();
+  }, [postId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,13 +53,12 @@ export default function CommentSection({ postId }) {
       });
       const data = await res.json();
       if (!res.ok) {
-        // console.log(data.message);
         setCommentError(data.message);
         return;
       }
       setComment('');
       setCommentError(null);
-      // console.log(data);
+      setComments([data, ...comments]);
     } catch (error) {
       setCommentError(error.message);
     }
@@ -97,12 +113,29 @@ export default function CommentSection({ postId }) {
               Submit
             </Button>
           </div>
+
           {commentError && (
             <Alert color="red" className="mt-5">
               {commentError}
             </Alert>
           )}
         </form>
+      )}
+      {comments.length === 0 ? (
+        <div className="my-5 text-sm">No comments yet</div>
+      ) : (
+        <>
+          <div className="flex text-sm items-center my-3 gap-2">
+            <p>Comments:</p>
+            <div className="border border-slate-500 py-1 px-3 rounded-sm">
+              <p>{comments.length}</p>
+            </div>
+          </div>
+
+          {comments.map((comment) => (
+            <Comment key={comment._id} comment={comment} />
+          ))}
+        </>
       )}
     </div>
   );
