@@ -2658,8 +2658,105 @@ import Comment from './Comment';
   }
 ```
 
-64. 11
+64. add comment edit functionality at server and client
+- add route at comment.route.js in routes folder  
+```javascript
+  import {editComment} from '../controllers/comment.controller.js';
+  ...
+  router.put('/editComment/:commentId', verifyToken, editComment);
+```
+- add controller at comment.controller.js in controllers folder  
+```javascript
+  export const editComment = async (req, res, next) => {
+    try {
+      const comment = await Comment.findById(req.params.commentId);
+      if (!comment) {return next(errorHandler(404, 'Comment not found!'));}
+      if (comment.userId !== req.user.id && !req.user.isAdmin) {
+        return next(errorHandler(403, 'You are not authorized to edit this comment!'),);}
+      const editedComment = await Comment.findByIdAndUpdate(
+        req.params.commentId,
+        {$set: {content: req.body.content,},},
+        { new: true },);
+      res.status(200).json(editedComment);
+    } catch (error) {next(error);}
+  };
+```
+- add handleEdit function at CommentSection.jsx at components folder in client  
+```javascript
+  ...
+  const handleEdit = async (comment, editedContennt) => {
+    try {
+      setComments( comments.map((c) => c._id === comment._id
+            ? {...c, content: editedContennt,}
+            : c, ),);
+    } catch (error) {console.log(error);}
+  };
+  ...
+      {comments.map((comment) => (
+      <Comment key={comment._id}. comment={comment} onLike={handleLike} onEdit={handleEdit}/>))}
+  ...
+```
+- add edit button at Comment.jsx at components folder in client
+```javascript
+  ...
+  import { Button, Textarea } from 'flowbite-react';
+  ...
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedContennt, setEditedContent] = useState(comment.content);
+  ...
+    const handleEdit = async () => {
+    setIsEditing(true);
+    setEditedContent(comment.content);};
 
+  const handleSave = async () => {
+    try {
+      const res = await fetch(`/api/comment/editComment/${comment._id}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json',},
+        body: JSON.stringify({ content: editedContennt }),});
+      if (res.ok) {
+        onEdit(comment, editedContennt);
+        setIsEditing(false);
+      }
+    } catch (error) {console.log(error);}
+  };
+  return (
+    ...
+    {isEditing ? (
+          <>
+            <Textarea
+              onChange={(e) => setEditedContent(e.target.value)}
+              value={editedContennt} />
+            <div className="flex justify-end gap-3">
+              <Button
+                onClick={handleSave}>
+                Save
+              </Button>
+              <Button
+                onClick={() => setIsEditing(false)}>
+                Cancel
+              </Button>
+            </div>
+          </>
+        ) : (
+          <>
+            ...
+              {currentUser &&
+                (comment.userId === currentUser._id || currentUser.isAdmin) && (
+                  <button onClick={handleEdit}> Edit </button>)
+              }
+            ...
+          </>
+          ...
+        )}
+
+  )
+  ...
+
+```
+<hr/>
+
+65. 111
 
 
 
