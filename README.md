@@ -2581,7 +2581,87 @@ import Comment from './Comment';
 ```
 <hr/>
 
-63. 111
+63. add like functionality at comment component at server and client
+- add like route at comment.route.js in routes folder  
+```javascript
+  import {likeComment,} from '../controllers/comment.controller.js';
+  ...
+  router.put('/likeComment/:commentId', verifyToken, likeComment);
+```
+- add like controller at comment.controller.js in controllers folder  
+```javascript
+  export const likeComment = async (req, res, next) => {
+    try {
+      const comment = await Comment.findById(req.params.commentId);
+      if (!comment) {return next(errorHandler(404, 'Comment not found!'));}
+      const userIndex = comment.likes.indexOf(req.user.id);
+      if (userIndex === -1) {
+        comment.likes.push(req.user.id);
+        comment.numberOfLikes++;
+      } else {
+        comment.likes.splice(userIndex, 1);
+        comment.numberOfLikes--;
+      }
+      await comment.save();
+      res.status(200).json(comment);
+    } catch (error) {next(error);}
+  };
+```
+- add handleLike function at CommentSection.jsx at components folder in client 
+```javascript
+  ...
+  import { Link, useNavigate } from 'react-router-dom';
+  ...
+  const navigate = useNavigate();
+  ...
+  const handleLike = async (commentId) => {
+    try {
+      if (!currentUser) {navigate('/sign-in'); return;}
+      const res = await fetch(`/api/comment/likeComment/${commentId}`, {
+        method: 'PUT',});
+      if (res.ok) {
+        const data = await res.json();
+        setComments(comments.map((comment) =>
+            comment._id === commentId
+              ? {
+                  ...comment,
+                  likes: data.likes,
+                  numberOfLikes: data.likes.length,}
+              : comment,),);
+      }
+    } catch (error) {console.log(error);}
+  };
+  ...
+      {comments.map((comment) => (
+      <Comment key={comment._id} comment={comment} onLike={handleLike} />
+     ))}
+  ...
+```
+- add like button at Comment.jsx
+```javascript
+  import { FaThumbsUp } from 'react-icons/fa';
+  import { useSelector } from 'react-redux';
+  ...
+  export default function Comment({ comment, onLike }) {
+    const { currentUser } = useSelector((state) => state.user);
+    ...
+          <div>
+            <button
+              onClick={() => onLike(comment._id)}>
+              <FaThumbsUp className="text-sm" />
+              <p> {comment.numberOfLikes > 0 && comment.numberOfLikes + ' ' +
+                  (comment.numberOfLikes === 1 ? 'like' : 'likes')}
+              </p>
+            </button>
+          </div>
+    ...
+  }
+```
+
+64. 11
+
+
+
 
 
 ### (43) Add listing api route at server(C) and MongoDB  

@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { FaThumbsUp } from 'react-icons/fa';
+import { useSelector } from 'react-redux';
 
 dayjs.extend(relativeTime);
 
-export default function Comment({ comment }) {
+export default function Comment({ comment, onLike }) {
   const [user, setUser] = useState({});
+  const { currentUser } = useSelector((state) => state.user);
   useEffect(() => {
     const getUser = async () => {
       try {
@@ -42,6 +45,21 @@ export default function Comment({ comment }) {
         <p className="text-gray-500 pb-2 dark:text-gray-200">
           {comment.content}
         </p>
+        <div className="flex gap-3 items-center pt-2 text-xs max-w-fit border-t dark:border-gray-500">
+          <button
+            type="button"
+            onClick={() => onLike(comment._id)}
+            className={`text-gray-400 hover:text-blue-500 hover:cursor-pointer ${currentUser && comment.likes && comment.likes.includes(currentUser._id) && 'text-blue-500!'}`}
+          >
+            <FaThumbsUp className="text-sm" />
+          </button>
+          <p className="text-gray-400">
+            {comment.numberOfLikes > 0 &&
+              comment.numberOfLikes +
+                ' ' +
+                (comment.numberOfLikes === 1 ? 'like' : 'likes')}
+          </p>
+        </div>
       </div>
     </div>
   );

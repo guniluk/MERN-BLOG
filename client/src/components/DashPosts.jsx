@@ -70,7 +70,7 @@ export default function DashPosts() {
         },
       );
       const data = await res.json();
-      console.log(data);
+      // console.log(data);
       if (res.ok) {
         setUserPosts((prev) =>
           prev.filter((post) => post._id !== postIdToDelete),
