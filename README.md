@@ -2756,9 +2756,92 @@ import Comment from './Comment';
 ```
 <hr/>
 
-65. 111
+65. add "delete comment functionalty" at server and client
+- add delete route at comment.route.js in routes folder  
+```javascript
+  import {deleteComment} from '../controllers/comment.controller.js';
+  ...
+  router.delete('/deleteComment/:commentId', verifyToken, deleteComment);
+```
+- add delete controller at comment.controller.js in controllers folder  
+```javascript
+  export const deleteComment = async (req, res, next) => {
+    try {
+      const comment = await Comment.findById(req.params.commentId);
+      if (!comment) {return next(errorHandler(404, 'Comment not found!'));}
+      if (comment.userId !== req.user.id && !req.user.isAdmin) {
+        return next(errorHandler(403, 'You are not authorized to delete this comment!'),);}
+      await Comment.findByIdAndDelete(req.params.commentId);
+      res.status(200).json({ message: 'Comment deleted successfully!' });
+    } catch (error) {next(error);}
+  };
+```
+- add handleDelete function at CommentSection.jsx at components folder in client  
+```javascript
+  import {Modal,ModalHeader,ModalBody,ModalFooter,} from 'flowbite-react';
+  import { HiOutlineExclamationCircle } from 'react-icons/hi';
+  ...
+  const [showModal, setShowModal] = useState(false);
+  const [commentToDelete, setCommentToDelete] = useState(null);
+  ...
+   const handleDelete = async (commentId) => {
+    setShowModal(false);
+    try {
+      if (!currentUser) {
+        navigate('/sign-in');
+        return;}
+      const res = await fetch(`/api/comment/deleteComment/${commentId}`, {
+        method: 'DELETE',});
+      if (res.ok) {
+        setComments(comments.filter((comment) => comment._id !== commentId));}
+    } catch (error) {console.log(error.message);}
+  };
+  ...
+    {comments.map((comment) => (
+    <Comment key={comment._id} comment={comment} onLike={handleLike} onEdit={handleEdit}
+      onDelete={(commentId) => {
+        setShowModal(true);
+        setCommentToDelete(commentId);}}
+    /> ))}
+    ...
+     <Modal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        popup
+        size="md"
+      >
+        <ModalBody>
+          <div className="text-center">
+            <HiOutlineExclamationCircle/>
+            <h3>Are you sure you want to delete this comment?</h3>
+          </div>
+        </ModalBody>
+        <ModalFooter className="flex justify-center gap-4">
+          <Button color="red" onClick={() => handleDelete(commentToDelete)}>
+            Yes, I'm sure
+          </Button>
+          <Button color="gray" onClick={() => setShowModal(false)}>
+            No, cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
+    ...
+```
+- add delete button at Comment.jsx at components folder in client  
+```javascript
+  ...
+  export default function Comment({ comment, onLike, onEdit, onDelete }) {
+    ...
+    <button
+      onClick={() => onDelete(comment._id)}>
+      Delete
+    </button>
+    ...
+  }
+```
+<hr/>
 
-
+66. 11
 
 
 ### (43) Add listing api route at server(C) and MongoDB  

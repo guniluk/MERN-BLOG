@@ -7,7 +7,7 @@ import { Button, Textarea } from 'flowbite-react';
 
 dayjs.extend(relativeTime);
 
-export default function Comment({ comment, onLike, onEdit }) {
+export default function Comment({ comment, onLike, onEdit, onDelete }) {
   const [user, setUser] = useState({});
   const { currentUser } = useSelector((state) => state.user);
   const [isEditing, setIsEditing] = useState(false);
@@ -121,13 +121,22 @@ export default function Comment({ comment, onLike, onEdit }) {
               </p>
               {currentUser &&
                 (comment.userId === currentUser._id || currentUser.isAdmin) && (
-                  <button
-                    type="button"
-                    onClick={handleEdit}
-                    className="text-gray-400 hover:text-blue-500 hover:cursor-pointer"
-                  >
-                    Edit
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleEdit}
+                      className="text-gray-400 hover:text-blue-500 hover:cursor-pointer"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDelete(comment._id)}
+                      className="text-gray-400 hover:text-red-500 hover:cursor-pointer"
+                    >
+                      Delete
+                    </button>
+                  </>
                 )}
             </div>
           </>
