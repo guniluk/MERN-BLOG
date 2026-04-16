@@ -2841,261 +2841,57 @@ import Comment from './Comment';
 ```
 <hr/>
 
-66. 11
-
-
-### (43) Add listing api route at server(C) and MongoDB  
-- create listing route, listing.route.js in routes folder   
-  >`import express from 'express';`  
-  >`import { createListing } from '../controllers/listing.controller.js';`  
-  >`import { verifyToken } from '../utils/verifyUser.js';`  
-  >`const router = express.Router();`  
-  >`router.post('/create', verifyToken, createListing);`  
-  >`export default router;`  
-- add router in index.js  
-  > ...  
-  > `import listingRouter from './routes/listing.route.js';`  
-  > ...  
-  > `app.use('/api/listing', listingRouter);`  
-- create listing controller in listing.controller.js(controllers folder)  
-  > `import Listing from '../models/listing.model.js';`  
-  > `export const createListing = async (req, res, next) => {`  
-  > `try {`  
-  > &nbsp;&nbsp;`const listing = await Listing.create(req.body);`  
-  > &nbsp;&nbsp;`res.status(201).json(listing);`  
-  > `} catch (error) {`         
-  > &nbsp;&nbsp;`next(error);`  
-  > `}};`   
-- create listing model in listing.model.js(models folder)  
-  > `import mongoose from 'mongoose';`  
-  > `const listingSchema = new mongoose.Schema(`  
-  > `{`  
-  > `name: {`  
-  > `type: String,`  
-  > `required: true,`  
-  > `},`  
-  > `...}`  
-  > `{ timestamps: true } );`  
-  > `const Listing = mongoose.model('Listing', listingSchema);`  
-  > `export default Listing;`  
-- using insomnia, create new listing
-  > POST : localhost:3000/api/listing/create (logged in first)
-- check MongoDB if the listing is created
+66. add recent article section to the posr page at client(B)  
+- create recent section at Postpage.jsx at pages folder in client(B)  
+```javascript
+  import PostCard from '../components/PostCard';
+  ...
+  const [recentPosts, setRecentPosts] = useState(null);
+  ...
+  useEffect(() => {
+  const fetchRecentPosts = async () => {
+    try {
+      const res = await fetch('/api/post/getposts?limit=3');
+      const data = await res.json();
+      if (!res.ok) {return;}
+      setRecentPosts(data.posts);
+    } catch (error) {console.log(error.message);}
+  };
+  fetchRecentPosts();
+  }, []);
+  ...
+    <div className="flex flex-col justify-center items-center mb-5">
+      <h1 className="text-xl mt-5">Recent Articles</h1>
+      <div className="flex flex-wrap gap-3 mt-5 justify-center">
+        {recentPosts &&
+          recentPosts.map((post) => <PostCard key={post._id} post={post} />)}
+      </div>
+    </div>
+```
+- create PostCard.jsx at components folder in client(B)  
+```javascript
+  import { Link } from 'react-router-dom';
+  export default function PostCard({ post }) {
+    return (
+      <div>
+        <Link to={`/post/${post.slug}`}>
+          <img src={post.image} alt={post.title} />
+        </Link>
+        <div className="flex flex-col  p-3 gap-2">
+          <p className="text-lg font-semibold line-clamp-2">{post.title}</p>
+          <span className="italic text-sm">{post.category}</span>
+          <Link to={`/post/${post.slug}`}>
+            Read Article
+          </Link>
+        </div>
+      </div>
+    );
+  }
+```
 <hr/>
 
-### (44) add listing page at client(B)  
-- add link button in profile.jsx  
-  > `import { Link } from 'react-router-dom';`  
-  > ...  
-  > `<form>`  
-  > ...
-  > `<Link to="/create-listing">`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`Create Listing`  
-  > `</Link>`  
-  > `</form>`  
-  > ...
-- add route in app.jsx as a member of ProviteRoute  
-  > ...  
-  > `import CreateListing from './pages/CreateListing';`  
-  > ...
-  > `<Route element={<PrivateRoute />}>`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`<Route path="/create-listing" element={<CreateListing />} />`  
-  > `</Route>`    
-  > ...
-- create CreateListing.jsx  
-  - make UI for needed data
-  - make functionality
-  - when succeded, navigate to list page
+67. 111
 
-### (45) get a certain user's listings at server(C)  
-- modify user.route.js  
-  > ...   
-  > `import {getUserListings} from '../controllers/user.controller.js';`  
-  > ...  
-  > `router.get('/listings/:id', verifyToken, getUserListings);`  
-  > ...  
-- modify user.controller.js  
-  > ...  
-  > `import Listing from '../models/listing.model.js';`   
-  > ...  
-  > `export const getUserListings = async (req, res, next) => {`  
-  > `if (req.user.id !== req.params.id) {`  
-  > `return next(errorHandler(401, 'You can get only your listings!'));}`  
-  > `try {`  
-  > `const listings = await Listing.find({ userRef: req.params.id });`  
-  > `res.status(200).json(listings);`  
-  > `} catch (error) {next(error);}`  
-  > `};`  
-<hr/>
-
-### (46) delete user listing at server(C) and client(B)  
-- modify listing.route.js(at server)  
-  > ...  
-  > `import {deleteListing} from '../controllers/listing.controller.js';`  
-  > ...  
-  > `router.delete('/delete/:id', verifyToken, deleteListing);`  
-  > ...  
-- modify listing.controller.js(at server)  
-  > ...  
-  > `export const deleteListing = async (req, res, next) => {`  
-  > `try {`  
-  > &nbsp;&nbsp;`const listing = await Listing.findById(req.params.id);`  
-  > &nbsp;&nbsp;`if (!listing) {return next(errorHandler(404, 'Listing not found!'));}`  
-  > &nbsp;&nbsp;`if (listing.userRef.toString() !== req.user.id) {`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`return next(errorHandler(401, 'You can delete only your listings!'));}`  
-  > &nbsp;&nbsp;`await Listing.findByIdAndDelete(req.params.id);`  
-  > &nbsp;&nbsp;`res.status(200).json({ message: 'Listing deleted successfully!' });`  
-  > `} catch (error) {next(error);}`  
-  > `};`  
-- modify profile.jsx (at client)  
-  > ...   
-  > `const handleListingDelete = async (listingId) => {`  
-  > `try {`  
-  > &nbsp;&nbsp;`const res = await fetch('/api/listing/delete/${listingId}',`   
-  > &nbsp;&nbsp;&nbsp;&nbsp;`{method: 'DELETE',});`  
-  > &nbsp;&nbsp;`const data = await res.json();`  
-  > &nbsp;&nbsp;`if (data.success === false) {console.log(data.message);`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`return;}`  
-  > &nbsp;&nbsp;`setUserListings((prev) =>`  
-  > &nbsp;&nbsp;`prev.filter((listing) => listing._id !== listingId),);`  
-  > &nbsp;&nbsp;`handleShowListings();`  
-  > `} catch (error) {console.log(error);}`  
-  > `};`  
-  > ... 
-  > `<button`  
-  > &nbsp;&nbsp;`onClick={() => handleListingDelete(listing._id)}>`  
-  > &nbsp;&nbsp;`Delete`  
-  > `</button>`  
-  > ...  
-<hr/>
-
-### (47) update user listing at server(C) and client(B)  
-- modify listing.route.js(at server)  
-  > ...  
-  > `import { updateListing, getListing} from '../controllers/listing.controller.js';`  
-  > ...  
-  > `router.post('/update/:id', verifyToken, updateListing);`  
-  > `router.get('/get/:id', getListing);`  
-  > ...  
-- modify listing.controller.js(at server)  
-  > ...  
-  > `export const updateListing = async (req, res, next) => {`  
-  > `try {`  
-  > &nbsp;&nbsp;`const listing = await Listing.findById(req.params.id);`  
-  > &nbsp;&nbsp;`if (!listing) {`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`return next(errorHandler(404, 'Listing not found!')); }`  
-  > &nbsp;&nbsp;`if (listing.userRef.toString() !== req.user.id) {`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`return next(errorHandler(401, 'You can delete only your listings!')); }`  
-  > &nbsp;&nbsp;`const updatedListing = await Listing.findByIdAndUpdate(`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`req.params.id,`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`req.body,`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`{ new: true }, );`  
-  > &nbsp;&nbsp;`res.status(200).json(updatedListing);`  
-  > `} catch (error) {`  
-  > `next(error);`  
-  > `} };`  
-  > ... 
-  > ...   
-  > `export const getListing = async (req, res, next) => {`  
-  > `try {`  
-  > `const listing = await Listing.findById(req.params.id);` 
-  > `if (!listing) {`  
-  > `return next(errorHandler(404, 'Listing not found!'));}`  
-  > `res.status(200).json(listing);`  
-  > `} catch (error) {`  
-  > `next(error);`  
-  > `} };`  
-- modify profile.jsx (at client)  
-  > ...  
-  > `<button`  
-  > `onClick={() => navigate(`/edit-listing/${listing._id}`)>`  
-  > `Edit`  
-  > `</button>`  
-  > ...  
-- add route in app.jsx as a member of PrivateRoute  
-  > ...  
-  > `import EditListing from './pages/EditListing';`  
-  > ...  
-  > `<Route element={<PrivateRoute />}>`  
-  > &nbsp;&nbsp;&nbsp;&nbsp;`<Route path="/edit-listing/:id" element={<EditListing />} />`  
-  > `</Route>`  
-  > ...   
-- create EditListing.jsx just like CreateListing.jsx but some differences 
-  > ...  
-  > `import {useParams } from 'react-router-dom';`  
-  > `export default function EditListing() {`  
-  > ...
-  > `const params = useParams();`  
-  > ...  
-  > `useEffect(() => {`  
-  > `const fetchListing = async () => {`  
-  > `const listingId = params.id;`  
-  > `const res = await fetch(`/api/listing/get/${listingId}`);`  
-  > `const data = await res.json();`  
-  > `if (data.success === false) {console.log(data.message);`  
-  > `return; }`  
-  > `setFormData(data);`  
-  > `};`  
-  > `fetchListing();},`  
-  > `[params.id]);`    
-  > ...  
-  > ...  
-  > `const handleSubmit = async (e) => {`  
-  > ...  
-  > `const res = await fetch(`/api/listing/update/${params.id}`, {`  
-  > `method: 'POST',`  
-  > `headers: {'Content-Type': 'application/json',},`  
-  > `body: JSON.stringify({ ...formData, userRef: currentUser._id }),});`  
-  > `const data = await res.json();`  
-  > ...  
-  > `navigate(`/listing/${data._id}`);`  
-  > ... 
-<hr/>
-
-### (48) detail listing page at client(B)  
-- create route in app.jsx  
-  > ...  
-  > `import Listing from './pages/Listing';`  
-  > ...  
-  > `<Route path="/listing/:listingId" element={<Listing />} />`  
-  > ...   
-- create Listing.jsx, importing useEffect, useState, useParams  
-
-### (49) add contact message at server(C) and client(B)  
-- add route for getting one user infomation in user.route.js 
-  > ...  
-  > `import {getUser} from '../controllers/user.controller.js';`
-  > ...  
-  > `router.get('/get/:id', verifyToken, getUser);`  
-  > ...  
-- add getUser function in user.controller.js  
-  > ...  
-  > `export const getUser = async (req, res, next) => {`  
-  > `try {`  
-  > &nbsp;&nbsp;`const user = await User.findById(req.params.id);`  
-  > &nbsp;&nbsp;`if (!user) {`  
-  > &nbsp;&nbsp;`return next(errorHandler(404, 'User not found!'));}`  
-  > &nbsp;&nbsp;`const { password, ...rest } = user._doc;`  
-  > &nbsp;&nbsp;`res.status(200).json(rest);`  
-  > `} catch (error) {`  
-  > &nbsp;&nbsp;`next(error);}`  
-  > `};`    
-- add contact message to listing.jsx  
-  > ...
-  > `import { useSelector } from 'react-redux';`  
-  > `import Contact from '../components/Contact';`  
-  > ...  
-  > `const Listing = () => {`  
-  > ...  
-  > `const { currentUser } = useSelector((state) => state.user);`  
-  > `const [contact, setContact] = useState(false);`  
-  > ...  
-  > `{currentUser && currentUser._id !== listing.userRef && !contact && (`  
-  > `<button onClick={() => setContact(true)} Contact Landlord</button>)}`  
-  > `{contact && <Contact listing={listing} />}`  
-  > ...  
-  > `}`  
-<hr/>
 
 ### (50) add search api at server(C)  
 - add search router in listing.route.js  
