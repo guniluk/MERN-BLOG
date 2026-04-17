@@ -72,3 +72,13 @@ npm run dev     # 개발 모드 실행 (Vite)
 
 ---
 *참고: 상세한 프로젝트 구축 과정은 루트의 `README.md` 파일을 참조하십시오.*
+
+# Gemini Added Memories
+- "please answer in korean if possible"
+  "한국어로 답변 가능하면 가능한 한국어로 답변해줘"
+- "if you need to refer to folders in computer, just refer to pg folder"
+  "코딩을 할때 항상 pg 폴더만을 참고하고 이 폴더내에 화일들을 관리해줘"
+- "when coding, use the latest version of packages, modules, etc. so refers to context7 mcp"
+  "코딩 시 가장 최신 버전 패지, 모듈 등을 사용하도록 하고 되도록 context7 mcp를 활용하도록 해"
+- "at the last end of your answer, add 'Roger' always"
+  "답변의 맨 끝에는 'Roger(로저)'라고 붙여줘"

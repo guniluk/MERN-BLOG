@@ -2841,7 +2841,7 @@ import Comment from './Comment';
 ```
 <hr/>
 
-66. add recent article section to the posr page at client(B)  
+66. add recent article section to the post page at client(B)  
 - create recent section at Postpage.jsx at pages folder in client(B)  
 ```javascript
   import PostCard from '../components/PostCard';
@@ -2890,7 +2890,152 @@ import Comment from './Comment';
 ```
 <hr/>
 
-67. 111
+67. add comments sections to the admin dashborad at server and client
+- add get comments route at comment.route.js in routes folder  
+```javascript
+  ...
+  import {getcomments} from '../controllers/comment.controller.js';
+  ...
+  router.get('/getcomments', verifyToken, getcomments);
+```
+- add getcomments controller at comment.controller.js in controllers folder  
+```javascript 
+  export const getcomments = async (req, res, next) => {
+    if (!req.user.isAdmin) {return next(errorHandler(403, 'You are not authorized to see all comments'),);}
+    try {
+      const startIndex = parseInt(req.query.startIndex) || 0;
+      const limit = parseInt(req.query.limit) || 9;
+      const sortDirection = req.query.sort === 'asc' ? 1 : -1;
+      const comments = await Comment.find()
+        .sort({ updatedAt: sortDirection })
+        .skip(startIndex)
+        .limit(limit);
+      const totalComments = await Comment.countDocuments();
+      const now = new Date();
+      const oneMonthAgo = new Date(now.getFullYear(),now.getMonth() - 1,now.getDate(),);
+      const lastMonthComments = await Comment.countDocuments({updatedAt: { $gte: oneMonthAgo },});
+      res.status(200).json({ comments, totalComments, lastMonthComments });
+    } catch (error) {next(error);}
+  };
+``` 
+- add comments sidebar at DashSidebar.jsx at components folder in client
+```javascript
+  {currentUser.isAdmin && (
+  <SidebarItem as={Link} to="/dashboard?tab=comments" active={tab === 'comments'} icon={HiAnnotation}>
+    Comments
+  </SidebarItem>)
+  }
+```
+- add comments section at Dashboard.jsx at pages folder in client  
+```javascript
+  import DashComments from '../components/DashComments';
+  ...
+    {/* comments */}
+    {tab === 'comments' && <DashComments />}
+```
+- create DashComments.jsx at components folder in client  
+```javascript
+  import { useEffect, useState } from 'react';
+  import { useSelector } from 'react-redux';
+  import {Table,TableBody,TableHead,TableHeadCell,TableRow,TableCell,Modal,ModalHeader,ModalBody,ModalFooter,Button,} from 'flowbite-react';
+  import { HiOutlineExclamationCircle } from 'react-icons/hi';
+  import { FaCheck, FaTimes } from 'react-icons/fa';
+
+  export default function DashComments() {
+    const { currentUser } = useSelector((state) => state.user);
+    const [comments, setComments] = useState([]);
+    const [showMore, setShowMore] = useState(true);
+    const [showModal, setShowModal] = useState(false);
+    const [commentIdToDelete, setCommentIdToDelete] = useState('');
+    useEffect(() => {
+      const fetchComments = async () => {
+        try {
+          const res = await fetch(`/api/comment/getcomments`);
+          const data = await res.json();
+          if (res.ok) {
+            setComments(data.comments);
+            if (data.comments.length < 9) {setShowMore(false);}}
+        } catch (error) {console.log(error);}
+      };
+      if (currentUser.isAdmin) {fetchComments();}
+    }, [currentUser._id, currentUser.isAdmin]);
+
+    const handleShowMore = async () => {
+      const startIndex = comments.length;
+      try {
+        const res = await fetch(`/api/comment/getcomments?startIndex=${startIndex}`,);
+        const data = await res.json();
+        if (res.ok) {
+          setComments((prev) => [...prev, ...data.comments]);
+          if (data.comments.length < 9) {setShowMore(false);}
+        }
+      } catch (error) {console.log(error);}
+    };
+
+    const handleDeleteComment = async () => {
+      setShowModal(false);
+      try {
+        const res = await fetch(`/api/comment/deleteComment/${commentIdToDelete}`, {method: 'DELETE',},);
+        const data = await res.json();
+        if (res.ok) {setComments((prev) => prev.filter((comment) => comment._id !== commentIdToDelete),);
+        } else {console.log(data.message);}
+      } catch (error) {console.log(error);}
+    };
+
+    return (
+      <div>
+        {currentUser.isAdmin && comments.length > 0 ? (
+          <>
+            <Table hoverable className="shadow-md">
+              <TableHead>
+                <TableRow>
+                  <TableHeadCell>Date updated</TableHeadCell>
+                  <TableHeadCell>Comment content</TableHeadCell>
+                  ...
+                </TableRow>
+              </TableHead>
+              {comments.map((comment) => (
+                <TableBody key={comment._id} className="divide-y">
+                  <TableRow className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                    <TableCell className="font-medium text-gray-900 dark:text-white">
+                      {new Date(comment.updatedAt).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="font-medium text-gray-900 dark:text-white">
+                      <p>{comment.content}</p>
+                    </TableCell>
+                    ...
+                  </TableRow>
+                </TableBody>
+              ))}
+            </Table>
+            {showMore && (<button onClick={handleShowMore}> Show More </button>)}
+          </>) 
+          : (<p>You have no comments to show</p>)}
+        <Modal show={showModal} onClose={() => setShowModal(false)}>
+          <ModalHeader>Delete Comment</ModalHeader>
+          <ModalBody>
+            <div className="text-center">
+              <HiOutlineExclamationCircle className="w-17 h-17 text-gray-400 dark:text-gray-200 mb-5 mx-auto" />
+              <h3 className="mb-5 text-gray-500 dark:text-gray-200 text-lg">
+                Are you sure you want to delete this comment? This action cannot
+                be undone^^
+              </h3>
+            </div>
+          </ModalBody>
+          <ModalFooter className="flex mx-auto gap-15">
+            <Button onClick={() => setShowModal(false)}>Cancel</Button>
+            <Button color="red" onClick={handleDeleteComment}>
+              Delete
+            </Button>
+          </ModalFooter>
+        </Modal>
+      </div>
+    );
+  }
+```
+<hr/>
+
+68. 111
 
 
 ### (50) add search api at server(C)  
@@ -2981,12 +3126,6 @@ import Comment from './Comment';
   <Route path="/search" element={<Search />} />  
   ...
 - create Search.jsx  
-
-### (53) add more page view at client(B)  
-
-
-
-
 
 
 
