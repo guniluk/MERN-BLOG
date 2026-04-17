@@ -3035,7 +3035,85 @@ import Comment from './Comment';
 ```
 <hr/>
 
-68. 111
+68. add dashboard overview to the admin dashboard at client
+- add dashboard overview at DashSidebar.jsx at components folder in client  
+```javascript
+  ...
+    {currentUser.isAdmin && (
+      <SidebarItem as={Link} to="/dashboard?tab=dash" active={tab === 'dash' || !tab}>
+        Dashboard
+      </SidebarItem>
+    )}
+```
+- add dashboard overview at Dashboard.jsx at pages folder in client  
+```javascript
+  import DashboardComp from '../components/DashboardComp';
+  ...
+    {/* dashboard comp */}
+    {tab === 'dash' && <DashboardComp />}
+```
+- create DashboardComp.jsx at components folder in client  
+```javascript
+  import { useSelector } from 'react-redux';
+  ...
+  export default function DashboardComp() {
+    const [users, setUsers] = useState([]);
+    const [posts, setPosts] = useState([]);
+    const [comments, setComments] = useState([]);
+    const [totalUsers, setTotalUsers] = useState(0);
+    const [totalPosts, setTotalPosts] = useState(0);
+    const [totalComments, setTotalComments] = useState(0);
+    const [lastMonthUsers, setLastMonthUsers] = useState(0);
+    const [lastMonthPosts, setLastMonthPosts] = useState(0);
+    const [lastMonthComments, setLastMonthComments] = useState(0);
+    const { currentUser } = useSelector((state) => state.user);
+
+    useEffect(() => {
+      const fetchUsers = async () => {
+        try {
+          const res = await fetch(`/api/user/getusers?limit=5`);
+          const data = await res.json();
+          if (res.ok) {
+            setUsers(data.users);
+            setTotalUsers(data.totalUsers);
+            setLastMonthUsers(data.lastMonthUsers);
+          }
+        } catch (error) {console.log(error.message);}};
+      const fetchPosts = async () => {
+        try {
+          const res = await fetch(`/api/post/getposts?limit=5`);
+          const data = await res.json();
+          if (res.ok) {
+            setPosts(data.posts);
+            setTotalPosts(data.totalPosts);
+            setLastMonthPosts(data.lastMonthPosts);}
+        } catch (error) {console.log(error.message);}};
+      const fetchComments = async () => {
+        try {
+          const res = await fetch(`/api/comment/getcomments?limit=5`);
+          const data = await res.json();
+          if (res.ok) {
+            setComments(data.comments);
+            setTotalComments(data.totalComments);
+            setLastMonthComments(data.lastMonthComments);}
+        } catch (error) {console.log(error.message);}};
+      if (currentUser.isAdmin) {
+        fetchUsers();
+        fetchPosts();
+        fetchComments();}
+    }, [currentUser]);
+
+    return (
+      <div>
+        ...
+      </div>
+    );
+  }
+```
+<hr/>
+
+69. 1111
+
 
 
 ### (50) add search api at server(C)  
