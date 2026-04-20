@@ -3112,9 +3112,48 @@ import Comment from './Comment';
 ```
 <hr/>
 
-69. 1111
+69. complete homepage at client(B)  
+- modify Home.jsx at pages folder in client(B)  
+```javascript
+  import { Link } from 'react-router-dom';
+  import CallToAction from '../components/CallToAction';
+  import { useEffect, useState } from 'react';
+  import PostCard from '../components/PostCard';
+  export default function Home() {
+    const [posts, setPosts] = useState([]);
+    useEffect(() => {
+      const fetchPosts = async () => {
+        try {
+          const res = await fetch('/api/post/getposts');
+          const data = await res.json();
+          if (res.ok) { setPosts(data.posts); }
+        } catch (error) { console.log(error); }};
+      fetchPosts(); }, []);
+    return (
+      <div>
+        <div className=" flex flex-col gap-6 p-28 px-3 max-w-6xl mx-auto">
+          <h1 className="text-3xl">Welcome to Young's Blog</h1>
+          <Link to="/search"> View all post </Link>
+        </div>
+        <div className="p-3 bg-amber-100 dark:bg-slate-700"><CallToAction /></div>
+        <div className="max-w-6xl p-3 mx-auto flex flex-col gap-8 py-7">
+          {posts && posts.length > 0 && (
+              <div className="flex flex-col gap-6">
+                <h2 className="text-2xl font-semibold text-center"> Recent Posts </h2>
+                <div className="flex flex-wrap gap-3 justify-center">
+                  {posts.map((post) => (<PostCard key={post._id} post={post} />))}
+                </div>
+                <Link to="/search"> View all posts </Link>
+              </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+```
+<hr/>
 
-
+70. 1111
 
 ### (50) add search api at server(C)  
 - add search router in listing.route.js  
