@@ -3327,103 +3327,45 @@ import Comment from './Comment';
    </form>
 
 ```
-
-
-
-
-
-### (50) add search api at server(C)  
-- add search router in listing.route.js  
-  ```javascript
-   ...  
-   import {getListings} from '../controllers/listing.controller.js'; 
-   ...  
-   router.get('/get', getListings);
-- add search function in listing.controller.js  
-  ```javascript
-  ...  
-  export const getListings = async (req, res, next) => {  
-    try {  
-      const limit = parseInt(req.query.limit) || 9;  
-      const startIndex = parseInt(req.query.startIndex) || 0;  
-      let offer = req.query.offer;  
-      if (offer === undefined || offer === 'false') {  
-        offer = { $in: [false, true] };}
-      let furnished = req.query.furnished;
-      if (furnished === undefined || furnished === 'false') {  
-        furnished = { $in: [false, true] };}  
-      let parking = req.query.parking; 
-      if (parking === undefined || parking === 'false') {
-        parking = { $in: [false, true] };} 
-      let type = req.query.type; 
-      if (type === undefined || type === 'all') {
-        type = { $in: ['sale', 'rent'] };} 
-      const searchTerm = req.query.searchTerm || '';  
-      const sort = req.query.sort || 'createdAt';  
-      const order = req.query.order || 'desc';  
-      const listings = await Listing.find({  
-        name: { $regex: searchTerm, $options: 'i' },  
-        offer,  
-        furnished,  
-        parking,  
-        type,})  
-      .sort({ [sort]: order })  
-      .limit(limit)  
-      .skip(startIndex);  
-      return res.status(200).json(listings);  
-    } catch (error) {  
-      next(error);}};
-- test using insomnia
 <hr/>
 
-### (51) header search form at client(B)  
-- add function in Header.jsx  
-  ```javascript
-  ...  
-  import { Link, useNavigate } from 'react-router-dom';  
-  import { useEffect, useState } from 'react';  
-  ...  
-  export default function Header() {  
-  ...  
-  const [searchTerm, setSearchTerm] = useState('');  
-  const navigate = useNavigate();  
-  const handleSubmit = (e) => {  
-    e.preventDefault();  
-    const urlParams = new URLSearchParams(window.location.search);  
-    urlParams.set('searchTerm', searchTerm);  
-    const urlQuery = urlParams.toString();  
-    navigate('/search?${urlQuery}');};  
-    useEffect(() => {  
-      const urlParams = new URLSearchParams(location.search);  
-      const searchTermFromUrl = urlParams.get('searchTerm');  
-      if (searchTermFromUrl) {  
-      setSearchTerm(searchTermFromUrl);} }, []);  
-  return (  
-    ...  
-    <form onSubmit={handleSubmit}>  
-    ...  
-    <input  
-      type="text"  
-      placeholder="Search"  
-      value={searchTerm}  
-      onChange={(e) => setSearchTerm(e.target.value)}  
-    ...  
-  ) }
-<hr /> 
+71. complete about and project page at client(B)  
+- modify About.jsx at pages folder in client(B)  
+```javascript
+  export default function About() {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="max-w-3xl mx-auto p-3 text-center">
+          <div>
+            <h1>About Young's Blog</h1>
+            <div>
+              <p>This is a blog homepage</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+```
+- modify Projects.jsx at pages folder in client(B)  
+```javascript
+  import CallToAction from '../components/CallToAction';
+  export default function Projects() {
+    return (
+      <div className="min-h-screen max-w-3xl mx-auto flex justify-center items-center flex-col p-3 gap-8">
+        <h1 className="text-3xl font-semibold">Projects</h1>
+        <p className="text-xl text-gray-500">
+          Build fun and engaging projects while learning web design and
+          development.
+        </p>
+        <CallToAction />
+      </div>
+    );
+  }
+```
+<hr/>
 
-### (52) add search page at client(B)  
-- add route in app.jsx
-  ```javascript
-  ...  
-  import Search from './pages/Search';  
-  ...  
-  <Route path="/search" element={<Search />} />  
-  ...
-- create Search.jsx  
-
-
-
-
+## The End
 
 
 # 【ETC】   
