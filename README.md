@@ -3365,6 +3365,38 @@ import Comment from './Comment';
 ```
 <hr/>
 
+72. For distribution, modify files.
+- modify package.json at root folder  
+```json
+  "scripts": {
+    ...
+    "build": "npm install && npm install --prefix client && npm run build --prefix client"
+  }
+```
+- modify index.js at server folder  
+```javascript
+  import path from 'path';
+  ...
+  const __dirname = path.resolve();
+  ...
+  app.use(express.static(path.join(__dirname, '/client/dist')));
+  app.use('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+  });
+```
+- git push to github
+<hr/>
+
+73.  Distribution
+- At render.com, sign in with google account, and go to dashboard
+- click add new project, select web service
+- select deploy from a git repository
+- select project, and click connect button
+- input name, branch(main), root dir(just empty), runtime(node), build command(npm run build), start command(npm start), choose Free option, add environmental variables(.env variables at server and client), and click create web service
+- when shown 'serveice is live', copy hoem address and test it in browser
+    - go to google firebase, go to console, select project, go to authentication, select settings and authorized domains, and add home page address domain
+
+
 ## The End
 
 
